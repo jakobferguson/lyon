@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '../../ui';
+import { NotificationBell } from '../../../features/notifications/components/NotificationBell/NotificationBell';
 import styles from './TopBar.module.css';
 
 const DEV_AUTH = import.meta.env.VITE_DEV_AUTH === 'true';
@@ -59,10 +60,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       </div>
 
       <div className={styles.right}>
-        {/* Notification bell — wired in Phase 6 */}
-        <button className={styles.iconBtn} aria-label="Notifications (0 unread)">
-          <span aria-hidden="true">🔔</span>
-        </button>
+        <NotificationBell />
 
         <span className={styles.divider} aria-hidden="true" />
 

@@ -1,5 +1,4 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { ComingSoon } from '../components/ui';
 import { AppShell } from '../components/layouts/AppShell/AppShell';
 import { ProtectedRoute } from './ProtectedRoute';
 
@@ -17,16 +16,23 @@ import { InvestigationListRoute } from '../features/investigations/routes/Invest
 import { InvestigationDetailRoute } from '../features/investigations/routes/InvestigationDetailRoute';
 
 // CAPAs (Phase 4)
-import { CapaListRoute } from '../features/capas/routes/CapaListRoute';
-import { NewCapaRoute }  from '../features/capas/routes/NewCapaRoute';
+import { CapaListRoute }   from '../features/capas/routes/CapaListRoute';
+import { NewCapaRoute }    from '../features/capas/routes/NewCapaRoute';
 import { CapaDetailRoute } from '../features/capas/routes/CapaDetailRoute';
 
 // Dashboard (Phase 5)
 import { DashboardRoute } from '../features/dashboard/routes/DashboardRoute';
 
-function Placeholder({ name }: { name: string }) {
-  return <ComingSoon name={name} />;
-}
+// Admin (Phase 6)
+import { AdminLayout }         from '../features/admin/components/AdminLayout/AdminLayout';
+import { AdminDashboardRoute } from '../features/admin/routes/AdminDashboardRoute';
+import { AdminRailroadsRoute } from '../features/admin/routes/AdminRailroadsRoute';
+import { AdminFactorsRoute }   from '../features/admin/routes/AdminFactorsRoute';
+import { AdminShiftsRoute }    from '../features/admin/routes/AdminShiftsRoute';
+import { AdminHoursRoute }     from '../features/admin/routes/AdminHoursRoute';
+import { AdminGeofencesRoute } from '../features/admin/routes/AdminGeofencesRoute';
+import { AdminUsersRoute }     from '../features/admin/routes/AdminUsersRoute';
+import { AdminAuditLogRoute }  from '../features/admin/routes/AdminAuditLogRoute';
 
 const DEV_AUTH = import.meta.env.VITE_DEV_AUTH === 'true';
 
@@ -79,19 +85,24 @@ export const router = createBrowserRouter([
             ],
           },
 
-          // Admin (Safety Manager+)
+          // Admin (Phase 6 — Safety Manager+, Audit Log Admin-only)
           {
             path: 'admin',
             element: <ProtectedRoute requiredRole="safety_manager" />,
             children: [
-              { index: true,              element: <Placeholder name="Admin" /> },
-              { path: 'railroads',        element: <Placeholder name="Railroad Rules" /> },
-              { path: 'factors',          element: <Placeholder name="Factor Types" /> },
-              { path: 'shifts',           element: <Placeholder name="Shift Windows" /> },
-              { path: 'hours',            element: <Placeholder name="Hours Worked" /> },
-              { path: 'geofences',        element: <Placeholder name="Geofences" /> },
-              { path: 'users',            element: <Placeholder name="User Management" /> },
-              { path: 'audit-log',        element: <Placeholder name="Audit Log" /> },
+              {
+                element: <AdminLayout />,
+                children: [
+                  { index: true,        element: <AdminDashboardRoute /> },
+                  { path: 'railroads',  element: <AdminRailroadsRoute /> },
+                  { path: 'factors',    element: <AdminFactorsRoute /> },
+                  { path: 'shifts',     element: <AdminShiftsRoute /> },
+                  { path: 'hours',      element: <AdminHoursRoute /> },
+                  { path: 'geofences',  element: <AdminGeofencesRoute /> },
+                  { path: 'users',      element: <AdminUsersRoute /> },
+                  { path: 'audit-log',  element: <AdminAuditLogRoute /> },
+                ],
+              },
             ],
           },
         ],

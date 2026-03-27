@@ -11,6 +11,8 @@ import { RECURRENCE_SEED } from '../../recurrence/types';
 import { RecurrenceLinkForm } from '../../recurrence/components/RecurrenceLinkForm/RecurrenceLinkForm';
 import { RecurrenceClusterView } from '../../recurrence/components/RecurrenceClusterView/RecurrenceClusterView';
 import type { RecurrenceLink } from '../../recurrence/types';
+import { useAuthStore } from '../../../stores/authStore';
+import { useNotificationStore } from '../../notifications/stores/notificationStore';
 import styles from './IncidentDetailRoute.module.css';
 
 type Tab = 'details' | 'investigation' | 'capas' | 'recurrence';
@@ -30,15 +32,39 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
+type PdfState = 'idle' | 'confirming' | 'generating' | 'success';
+
+const COORDINATOR_PLUS_ROLES = ['safety_coordinator', 'safety_manager', 'division_manager', 'executive', 'admin'];
+const MEDICAL_ACCESS_ROLES   = ['safety_manager', 'division_manager', 'executive', 'admin'];
+
 export function IncidentDetailRoute() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const incident = INCIDENT_SEED.find((i) => i.id === id);
+  const role = useAuthStore((s) => s.role);
+  const addNotification = useNotificationStore((s) => s.addNotification);
 
   const [tab, setTab] = useState<Tab>('details');
   const [recurrenceLinks, setRecurrenceLinks] = useState<RecurrenceLink[]>(
     RECURRENCE_SEED.filter((l) => l.incidentAId === id || l.incidentBId === id),
   );
+  const [pdfState, setPdfState] = useState<PdfState>('idle');
+
+  const canGenerateReport = role ? COORDINATOR_PLUS_ROLES.includes(role) : false;
+  const hasMedicalAccess  = role ? MEDICAL_ACCESS_ROLES.includes(role) : false;
+
+  function handleGenerateReport() {
+    setPdfState('generating');
+    setTimeout(() => {
+      setPdfState('success');
+      addNotification({
+        eventType: 'incident_reported',
+        title: 'Incident Report Generated',
+        summary: `PDF report for ${incident?.incidentNumber ?? id} was successfully generated.`,
+        linkTo: `/app/incidents/${id}`,
+      });
+    }, 1800);
+  }
 
   if (!incident) {
     return (
@@ -65,7 +91,57 @@ export function IncidentDetailRoute() {
           </div>
           <p className={styles.subtitle}>{incident.incidentType} · {formatDateLong(incident.dateTime)}</p>
         </div>
+        {canGenerateReport && (
+          <Button variant="secondary" onClick={() => setPdfState('confirming')}>
+            📄 Generate Report
+          </Button>
+        )}
       </div>
+
+      {/* Generate Report Modal */}
+      {(pdfState === 'confirming' || pdfState === 'generating' || pdfState === 'success') && (
+        <div className={styles.modalOverlay} role="dialog" aria-modal="true" aria-label="Generate Report">
+          <div className={styles.modal}>
+            {pdfState === 'confirming' && (
+              <>
+                <h2 className={styles.modalTitle}>Generate Incident Report</h2>
+                <p className={styles.modalBody}>
+                  A PDF report will be generated for <strong>{incident.incidentNumber}</strong>.
+                </p>
+                {!hasMedicalAccess && (
+                  <div className={styles.redactionNotice}>
+                    <span>⚕</span>
+                    <p>Medical details will be <strong>redacted</strong> from this report. Only Safety Managers and above can view medical information.</p>
+                  </div>
+                )}
+                <div className={styles.modalActions}>
+                  <Button variant="secondary" onClick={() => setPdfState('idle')}>Cancel</Button>
+                  <Button variant="primary" onClick={handleGenerateReport}>Generate PDF</Button>
+                </div>
+              </>
+            )}
+            {pdfState === 'generating' && (
+              <>
+                <h2 className={styles.modalTitle}>Generating Report…</h2>
+                <div className={styles.modalSpinner} aria-label="Loading" />
+                <p className={styles.modalBody}>Please wait while your report is being prepared.</p>
+              </>
+            )}
+            {pdfState === 'success' && (
+              <>
+                <div className={styles.modalSuccess}>✅</div>
+                <h2 className={styles.modalTitle}>Report Ready</h2>
+                <p className={styles.modalBody}>
+                  The PDF report for <strong>{incident.incidentNumber}</strong> has been generated successfully. In production, it would download automatically.
+                </p>
+                <div className={styles.modalActions}>
+                  <Button variant="primary" onClick={() => setPdfState('idle')}>Close</Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className={styles.tabs} role="tablist">
