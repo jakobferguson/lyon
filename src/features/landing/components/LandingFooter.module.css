@@ -1,0 +1,54 @@
+.footer {
+  background-color: var(--rich-black);
+  border-top: 1px solid rgba(255, 209, 0, 0.2);
+  padding: 2rem 1.5rem;
+}
+
+.inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.logoName {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--herzog-gold);
+}
+
+.appName {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.subtitle {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.72rem;
+  color: var(--mid-gray);
+  width: 100%;
+  margin-top: 0.1rem;
+}
+
+.copy {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  color: var(--mid-gray);
+}

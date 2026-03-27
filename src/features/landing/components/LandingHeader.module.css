@@ -1,0 +1,98 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  height: 56px;
+  background-color: var(--rich-black);
+  border-bottom: 3px solid var(--herzog-gold);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoName {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--herzog-gold);
+}
+
+.logoDivider {
+  display: block;
+  width: 1px;
+  height: 18px;
+  background-color: var(--dark-gray);
+}
+
+.logoApp {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+/* Nav */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.navLink {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--smoke);
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: var(--white);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.navLinkCta {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--rich-black);
+  background-color: var(--herzog-gold);
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+  margin-left: 0.5rem;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.navLinkCta:hover {
+  background-color: var(--dark-yellow);
+  color: var(--rich-black);
+}
+
+@media (max-width: 600px) {
+  .navLink {
+    display: none;
+  }
+}
