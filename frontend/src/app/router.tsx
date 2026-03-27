@@ -21,6 +21,9 @@ import { CapaListRoute } from '../features/capas/routes/CapaListRoute';
 import { NewCapaRoute }  from '../features/capas/routes/NewCapaRoute';
 import { CapaDetailRoute } from '../features/capas/routes/CapaDetailRoute';
 
+// Dashboard (Phase 5)
+import { DashboardRoute } from '../features/dashboard/routes/DashboardRoute';
+
 function Placeholder({ name }: { name: string }) {
   return <ComingSoon name={name} />;
 }
@@ -47,8 +50,8 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/app/dashboard" replace /> },
 
-          // Dashboard
-          { path: 'dashboard', element: <Placeholder name="Dashboard" /> },
+          // Dashboard (Phase 5)
+          { path: 'dashboard', element: <DashboardRoute /> },
 
           // Incidents (Phase 2)
           { path: 'incidents',       element: <IncidentListRoute /> },

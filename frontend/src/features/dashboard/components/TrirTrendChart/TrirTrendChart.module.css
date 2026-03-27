@@ -1,0 +1,50 @@
+.wrapper {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0 0 0.2rem;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}
+
+.benchmarkLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-warning, #f59e0b);
+  font-weight: 600;
+}
+
+.benchmarkDot {
+  width: 20px;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-warning, #f59e0b) 0px,
+    var(--color-warning, #f59e0b) 6px,
+    transparent 6px,
+    transparent 9px
+  );
+  display: inline-block;
+}

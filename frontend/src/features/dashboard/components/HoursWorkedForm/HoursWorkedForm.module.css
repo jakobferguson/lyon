@@ -1,0 +1,40 @@
+.body { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.lastEntry {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #aaa);
+  background: var(--color-surface-elevated, #222);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+}
+
+.lastLabel {
+  font-weight: 600;
+  color: var(--color-text-muted, #888);
+  white-space: nowrap;
+}
+
+.form { display: flex; flex-direction: column; gap: 1rem; }
+
+.divisionSection { display: flex; flex-direction: column; gap: 0.625rem; }
+
+.divisionTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #aaa);
+  margin: 0;
+}
+
+.divisionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+@media (max-width: 500px) { .divisionGrid { grid-template-columns: 1fr; } }
+
+.actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
