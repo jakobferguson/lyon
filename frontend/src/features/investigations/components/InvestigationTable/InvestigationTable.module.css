@@ -70,7 +70,7 @@
 
 .incidentNum {
   font-weight: 600;
-  color: var(--color-accent, #c8a45a) !important;
+  color: var(--color-accent, #c8a45a);
 }
 
 .date {
@@ -86,7 +86,7 @@
 .empty {
   text-align: center;
   color: var(--color-text-muted, #888);
-  padding: 2.5rem !important;
+  padding: 2.5rem;
   font-style: italic;
 }
 

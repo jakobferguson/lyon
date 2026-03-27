@@ -141,6 +141,7 @@ export function FiveWhyBuilder({ steps: initialSteps, rootCauseSummary: initialS
         ],
   );
   const [rootCauseSummary, setRootCauseSummary] = useState(initialSummary);
+  const [summaryTouched, setSummaryTouched] = useState(false);
   const [saved, setSaved] = useState(false);
 
   function handleChange(index: number, updated: FiveWhyStep) {
@@ -215,8 +216,8 @@ export function FiveWhyBuilder({ steps: initialSteps, rootCauseSummary: initialS
           <textarea
             className="lyon-input"
             rows={3}
-            value={rootCauseSummary || lastFinalAnswer}
-            onChange={(e) => { setRootCauseSummary(e.target.value); setSaved(false); }}
+            value={summaryTouched ? rootCauseSummary : (rootCauseSummary || lastFinalAnswer)}
+            onChange={(e) => { setSummaryTouched(true); setRootCauseSummary(e.target.value); setSaved(false); }}
             placeholder="Summarize the root cause…"
           />
         )}
