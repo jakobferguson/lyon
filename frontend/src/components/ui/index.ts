@@ -18,3 +18,7 @@ export {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from './DropdownMenu/DropdownMenu';
+
+export { ProgressBar } from './ProgressBar/ProgressBar';
+export { FormField } from './FormField/FormField';
+export { Modal } from './Modal/Modal';
