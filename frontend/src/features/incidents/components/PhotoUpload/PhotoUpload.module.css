@@ -1,0 +1,120 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.dropZone {
+  border: 2px dashed var(--border-gray);
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.dropZone:hover,
+.dropZone:focus {
+  border-color: var(--navy-blue);
+  background-color: var(--light-gray);
+  outline: none;
+}
+
+.dragging {
+  border-color: var(--navy-blue);
+  background-color: var(--light-gray);
+}
+
+.dropIcon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+
+.dropText {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  margin-bottom: 0.25rem;
+}
+
+.browse { color: var(--navy-blue); font-weight: 500; text-decoration: underline; }
+
+.dropHint {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  color: var(--mid-gray);
+}
+
+/* Errors */
+.errors {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.errors li {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.78rem;
+  color: var(--error-red);
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.65rem;
+}
+
+.thumb {
+  position: relative;
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: var(--light-gray);
+}
+
+.img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbMeta {
+  padding: 0.3rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.thumbName {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.68rem;
+  color: var(--dark-gray);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thumbSize {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.62rem;
+  color: var(--mid-gray);
+}
+
+.removeBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: rgba(0,0,0,0.55);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.removeBtn:hover { background-color: var(--error-red); }

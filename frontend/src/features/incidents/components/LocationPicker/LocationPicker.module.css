@@ -1,0 +1,40 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gpsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.gpsCoords {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.8rem;
+  color: var(--success-green);
+  background-color: var(--success-light);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--success-green);
+  font-size: 0.75rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.gpsErr {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.78rem;
+  color: var(--warning-amber);
+}

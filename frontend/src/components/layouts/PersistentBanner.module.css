@@ -1,0 +1,65 @@
+.banner {
+  width: 100%;
+  background-color: var(--warning-light);
+  border-bottom: 2px solid var(--warning-amber);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  flex-shrink: 0;
+}
+
+.icon {
+  font-size: 1.1rem;
+  color: var(--warning-amber);
+  flex-shrink: 0;
+}
+
+.message {
+  flex: 1;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--warning-amber);
+  line-height: 1.4;
+}
+
+.collapseBtn {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--warning-amber);
+  background: none;
+  border: 1px solid var(--warning-amber);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.collapseBtn:hover {
+  background-color: rgba(138, 87, 0, 0.08);
+}
+
+/* Collapsed bar */
+.collapsedBar {
+  padding: 0.3rem 1.25rem;
+}
+
+.expandBtn {
+  background: none;
+  border: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--warning-amber);
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.expandBtn:hover {
+  text-decoration: underline;
+}

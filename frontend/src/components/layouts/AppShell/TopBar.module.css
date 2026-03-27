@@ -1,0 +1,137 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--topbar-height);
+  background-color: var(--rich-black);
+  border-bottom: 3px solid var(--herzog-gold);
+  padding: 0 1rem;
+  flex-shrink: 0;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Hamburger */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.hamburger:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.hamburgerBar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--smoke);
+  border-radius: 2px;
+  transition: background-color 0.15s ease;
+}
+
+.hamburger:hover .hamburgerBar {
+  background-color: var(--white);
+}
+
+/* Icon buttons (bell) */
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  color: var(--smoke);
+  font-size: 1rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.iconBtn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+}
+
+/* Divider */
+.divider {
+  display: block;
+  width: 1px;
+  height: 20px;
+  background-color: var(--dark-gray);
+  margin: 0 0.25rem;
+}
+
+/* User button */
+.userBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  border-radius: 5px;
+  transition: background-color 0.15s ease;
+}
+
+.userBtn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+.userName {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.userRole {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.68rem;
+  color: var(--smoke);
+  white-space: nowrap;
+}
+
+.chevron {
+  color: var(--smoke);
+  font-size: 0.7rem;
+  margin-left: 0.1rem;
+}
+
+@media (max-width: 600px) {
+  .userInfo { display: none; }
+}

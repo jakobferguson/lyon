@@ -1,0 +1,36 @@
+.badge {
+  display: inline-block;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.6rem;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.active {
+  background-color: var(--success-light);
+  color: var(--success-green);
+}
+
+.pending {
+  background-color: var(--warning-light);
+  color: var(--warning-amber);
+}
+
+.overdue {
+  background-color: var(--error-light);
+  color: var(--error-red);
+}
+
+.info {
+  background-color: var(--info-light);
+  color: var(--info-teal);
+}
+
+.neutral {
+  background-color: var(--light-gray);
+  color: var(--mid-gray);
+}
