@@ -7,6 +7,11 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { LandingRoute } from '../features/landing/routes/LandingRoute';
 import { DevLoginRoute } from '../features/dev-login/routes/DevLoginRoute';
 
+// Incidents (Phase 2)
+import { IncidentListRoute } from '../features/incidents/routes/IncidentListRoute';
+import { NewIncidentRoute } from '../features/incidents/routes/NewIncidentRoute';
+import { IncidentDetailRoute } from '../features/incidents/routes/IncidentDetailRoute';
+
 function Placeholder({ name }: { name: string }) {
   return <ComingSoon name={name} />;
 }
@@ -36,10 +41,10 @@ export const router = createBrowserRouter([
           // Dashboard
           { path: 'dashboard', element: <Placeholder name="Dashboard" /> },
 
-          // Incidents
-          { path: 'incidents',       element: <Placeholder name="Incidents" /> },
-          { path: 'incidents/new',   element: <Placeholder name="New Incident" /> },
-          { path: 'incidents/:id',   element: <Placeholder name="Incident Detail" /> },
+          // Incidents (Phase 2)
+          { path: 'incidents',       element: <IncidentListRoute /> },
+          { path: 'incidents/new',   element: <NewIncidentRoute /> },
+          { path: 'incidents/:id',   element: <IncidentDetailRoute /> },
 
           // Investigations (Safety Coordinator+)
           {

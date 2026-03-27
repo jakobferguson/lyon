@@ -1,0 +1,151 @@
+.completionWrap {
+  background-color: var(--white);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Accordion/stepper sections */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section {
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--white);
+}
+
+.sectionOpen {
+  border-color: var(--navy-blue);
+}
+
+.sectionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.12s ease;
+}
+
+.sectionHeader:hover {
+  background-color: var(--light-gray);
+}
+
+.sectionLabel {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rich-black);
+}
+
+.sectionOpen .sectionLabel {
+  color: var(--navy-blue);
+}
+
+.chevron {
+  font-size: 0.7rem;
+  color: var(--mid-gray);
+}
+
+.sectionBody {
+  padding: 1.1rem 1.25rem;
+  border-top: 1px solid var(--border-gray);
+}
+
+/* Grid within sections */
+.sectionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+/* Checkbox */
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.88rem;
+  color: var(--dark-gray);
+  cursor: pointer;
+}
+
+.checkHint {
+  font-size: 0.75rem;
+  color: var(--mid-gray);
+  margin-left: 0.25rem;
+}
+
+/* N/A message */
+.naMessage {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+  color: var(--mid-gray);
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+.sectionDesc {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+  color: var(--mid-gray);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Form actions */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+/* Success */
+.successCard {
+  background-color: var(--success-light);
+  border: 1px solid var(--success-green);
+  border-radius: 10px;
+  padding: 2.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.successIcon { font-size: 2.5rem; }
+
+.successTitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  color: var(--success-green);
+}
+
+.successMsg {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .sectionGrid { grid-template-columns: 1fr; }
+}

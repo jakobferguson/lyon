@@ -1,0 +1,74 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dark-gray);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.required {
+  color: var(--error-red);
+}
+
+.hipaaBadge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--info-teal);
+  background-color: var(--info-light);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+.hint {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  color: var(--mid-gray);
+  line-height: 1.4;
+}
+
+.error {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  color: var(--error-red);
+  line-height: 1.4;
+}
+
+/* Shared input/select/textarea styling — apply via global class */
+:global(.lyon-input) {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+  background-color: var(--white);
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  padding: 0.5rem 0.65rem;
+  width: 100%;
+  transition: border-color 0.15s ease;
+}
+
+:global(.lyon-input:focus) {
+  outline: 2px solid var(--navy-blue);
+  outline-offset: 1px;
+  border-color: var(--navy-blue);
+}
+
+:global(.lyon-input:disabled) {
+  background-color: var(--light-gray);
+  color: var(--mid-gray);
+  cursor: not-allowed;
+}
+
+.hasError :global(.lyon-input) {
+  border-color: var(--error-red);
+}

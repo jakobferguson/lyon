@@ -1,0 +1,99 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+}
+
+.table thead tr {
+  background-color: var(--off-white);
+}
+
+.table th {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mid-gray);
+  border-bottom: 1px solid var(--border-gray);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.75rem 1rem;
+  color: var(--dark-gray);
+  border-bottom: 1px solid var(--border-gray);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.row {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.row:hover {
+  background-color: var(--light-gray);
+}
+
+.row:focus {
+  outline: 2px solid var(--navy-blue);
+  outline-offset: -2px;
+}
+
+.number {
+  font-weight: 600;
+  color: var(--navy-blue);
+  white-space: nowrap;
+}
+
+.date {
+  white-space: nowrap;
+  color: var(--mid-gray);
+}
+
+.project {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  text-align: center;
+  color: var(--mid-gray);
+  padding: 2rem;
+  font-style: italic;
+}
+
+.count {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  color: var(--mid-gray);
+  text-align: right;
+}
