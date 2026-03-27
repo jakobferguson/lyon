@@ -16,6 +16,11 @@ import { IncidentDetailRoute } from '../features/incidents/routes/IncidentDetail
 import { InvestigationListRoute } from '../features/investigations/routes/InvestigationListRoute';
 import { InvestigationDetailRoute } from '../features/investigations/routes/InvestigationDetailRoute';
 
+// CAPAs (Phase 4)
+import { CapaListRoute } from '../features/capas/routes/CapaListRoute';
+import { NewCapaRoute }  from '../features/capas/routes/NewCapaRoute';
+import { CapaDetailRoute } from '../features/capas/routes/CapaDetailRoute';
+
 function Placeholder({ name }: { name: string }) {
   return <ComingSoon name={name} />;
 }
@@ -60,14 +65,14 @@ export const router = createBrowserRouter([
             ],
           },
 
-          // CAPAs (Safety Coordinator+)
+          // CAPAs (Phase 4 — Safety Coordinator+)
           {
             path: 'capas',
             element: <ProtectedRoute requiredRole="safety_coordinator" />,
             children: [
-              { index: true,    element: <Placeholder name="CAPAs" /> },
-              { path: 'new',    element: <Placeholder name="New CAPA" /> },
-              { path: ':id',    element: <Placeholder name="CAPA Detail" /> },
+              { index: true,    element: <CapaListRoute /> },
+              { path: 'new',    element: <NewCapaRoute /> },
+              { path: ':id',    element: <CapaDetailRoute /> },
             ],
           },
 

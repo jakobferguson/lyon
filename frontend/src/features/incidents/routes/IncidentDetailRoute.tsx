@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Badge } from '../../../components/ui';
+import { Badge, Button } from '../../../components/ui';
 import { INCIDENT_SEED } from '../types';
 import { STATUS_VARIANT, formatDateLong } from '../utils';
 import { INVESTIGATION_SEED } from '../../investigations/types';
 import { INVESTIGATION_STATUS_VARIANT, formatDateOnly, getEscalationTier } from '../../investigations/utils';
+import { CAPA_SEED } from '../../capas/types';
+import { CAPA_STATUS_VARIANT, PRIORITY_VARIANT, isOverdue } from '../../capas/utils';
+import { RECURRENCE_SEED } from '../../recurrence/types';
+import { RecurrenceLinkForm } from '../../recurrence/components/RecurrenceLinkForm/RecurrenceLinkForm';
+import { RecurrenceClusterView } from '../../recurrence/components/RecurrenceClusterView/RecurrenceClusterView';
+import type { RecurrenceLink } from '../../recurrence/types';
 import styles from './IncidentDetailRoute.module.css';
 
 type Tab = 'details' | 'investigation' | 'capas' | 'recurrence';
@@ -30,6 +36,9 @@ export function IncidentDetailRoute() {
   const incident = INCIDENT_SEED.find((i) => i.id === id);
 
   const [tab, setTab] = useState<Tab>('details');
+  const [recurrenceLinks, setRecurrenceLinks] = useState<RecurrenceLink[]>(
+    RECURRENCE_SEED.filter((l) => l.incidentAId === id || l.incidentBId === id),
+  );
 
   if (!incident) {
     return (
@@ -181,17 +190,63 @@ export function IncidentDetailRoute() {
           );
         })()}
 
-        {tab === 'capas' && (
-          <div className={styles.comingSoon}>
-            <span>✅</span>
-            <p>CAPA details will be available in Phase 4.</p>
-          </div>
-        )}
+        {tab === 'capas' && (() => {
+          const linkedCapas = CAPA_SEED.filter((c) => c.linkedIncidentIds.includes(incident.id));
+          return (
+            <div className={styles.capasTab}>
+              <div className={styles.capaTabHeader}>
+                <span className={styles.capaCount}>{linkedCapas.length} CAPA{linkedCapas.length !== 1 ? 's' : ''} linked to this incident</span>
+                <Link to="/app/capas/new">
+                  <Button variant="accent">+ New CAPA</Button>
+                </Link>
+              </div>
+              {linkedCapas.length === 0 ? (
+                <div className={styles.comingSoon}>
+                  <span>✅</span>
+                  <p>No CAPAs have been linked to this incident yet.</p>
+                </div>
+              ) : (
+                <div className={styles.capaList}>
+                  {linkedCapas.map((capa) => {
+                    const overdue = isOverdue(capa);
+                    return (
+                      <Link key={capa.id} to={`/app/capas/${capa.id}`} className={styles.capaCard}>
+                        <div className={styles.capaCardHeader}>
+                          <span className={styles.capaNum}>{capa.capaNumber}</span>
+                          <div className={styles.capaBadges}>
+                            <Badge variant={PRIORITY_VARIANT[capa.priority]}>{capa.priority}</Badge>
+                            <Badge variant={CAPA_STATUS_VARIANT[capa.status]}>{capa.status}</Badge>
+                            {overdue && <Badge variant="overdue">Overdue</Badge>}
+                          </div>
+                        </div>
+                        <p className={styles.capaDesc}>{capa.description}</p>
+                        <div className={styles.capaMeta}>
+                          <span>{capa.type} · {capa.category}</span>
+                          <span>Assigned to {capa.assignedTo}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {tab === 'recurrence' && (
-          <div className={styles.comingSoon}>
-            <span>🔗</span>
-            <p>Recurrence linking will be available in Phase 4.</p>
+          <div className={styles.recurrenceTab}>
+            <RecurrenceLinkForm
+              currentIncidentId={incident.id}
+              existingLinks={recurrenceLinks}
+              onLink={(link) => setRecurrenceLinks((prev) => [...prev, link])}
+            />
+            <div className={styles.clusterSection}>
+              <h3 className={styles.clusterTitle}>Linked Incidents</h3>
+              <RecurrenceClusterView
+                currentIncidentId={incident.id}
+                links={recurrenceLinks}
+              />
+            </div>
           </div>
         )}
       </div>
