@@ -10,16 +10,14 @@ interface TooltipProps {
 
 export function Tooltip({ content, children, side = 'top' }: TooltipProps) {
   return (
-    <RadixTooltip.Provider delayDuration={300}>
-      <RadixTooltip.Root>
-        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
-        <RadixTooltip.Portal>
-          <RadixTooltip.Content className={styles.content} side={side} sideOffset={6}>
-            {content}
-            <RadixTooltip.Arrow className={styles.arrow} />
-          </RadixTooltip.Content>
-        </RadixTooltip.Portal>
-      </RadixTooltip.Root>
-    </RadixTooltip.Provider>
+    <RadixTooltip.Root>
+      <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+      <RadixTooltip.Portal>
+        <RadixTooltip.Content className={styles.content} side={side} sideOffset={6}>
+          {content}
+          <RadixTooltip.Arrow className={styles.arrow} />
+        </RadixTooltip.Content>
+      </RadixTooltip.Portal>
+    </RadixTooltip.Root>
   );
 }

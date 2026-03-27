@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { usePermission } from '../hooks/usePermission';
 import type { Role } from '../types';
-import { ComingSoon } from '../components/ui';
+import { AccessDenied } from '../components/ui';
 
 const DEV_AUTH = import.meta.env.VITE_DEV_AUTH === 'true';
 
@@ -19,7 +19,7 @@ export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
   }
 
   if (requiredRole && !hasPermission) {
-    return <ComingSoon name="Access Denied" />;
+    return <AccessDenied />;
   }
 
   return <Outlet />;

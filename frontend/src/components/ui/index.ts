@@ -9,6 +9,7 @@ export { Spinner } from './Spinner/Spinner';
 export { Avatar } from './Avatar/Avatar';
 export { Tooltip } from './Tooltip/Tooltip';
 export { ComingSoon } from './ComingSoon/ComingSoon';
+export { AccessDenied } from './AccessDenied/AccessDenied';
 
 export {
   DropdownMenu,

@@ -1,14 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
+import { msalInstance } from '../../../lib/msal';
 import {
   Avatar,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from '../../ui';
 import styles from './TopBar.module.css';
+
+const DEV_AUTH = import.meta.env.VITE_DEV_AUTH === 'true';
 
 const ROLE_LABELS: Record<string, string> = {
   field_reporter:     'Field Reporter',
@@ -28,9 +30,13 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { user, role, clearUser } = useAuth();
   const navigate = useNavigate();
 
-  function handleSignOut() {
+  async function handleSignOut() {
     clearUser();
-    navigate('/');
+    if (!DEV_AUTH) {
+      await msalInstance.logoutRedirect({ postLogoutRedirectUri: '/' });
+    } else {
+      navigate('/');
+    }
   }
 
   return (
@@ -73,10 +79,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => navigate('/app/profile')}>
-                My Profile
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={handleSignOut} destructive>
                 Sign Out
               </DropdownMenuItem>
