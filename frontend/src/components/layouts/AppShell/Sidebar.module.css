@@ -1,0 +1,118 @@
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  background-color: var(--rich-black);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.2s ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.collapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+/* Logo block */
+.logoBlock {
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem 1rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.logoName {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--herzog-gold);
+  white-space: nowrap;
+}
+
+.logoApp {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
+  margin-top: 0.1rem;
+  white-space: nowrap;
+}
+
+/* Nav */
+.nav {
+  flex: 1;
+  padding: 0.75rem 0;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* Nav item */
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 1rem;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--smoke);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  border-radius: 0 4px 4px 0;
+}
+
+.navItem:hover {
+  color: var(--white);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.navItem.active {
+  color: var(--herzog-gold);
+  border-left-color: var(--herzog-gold);
+  background-color: rgba(255, 209, 0, 0.07);
+  font-weight: 500;
+}
+
+.icon {
+  font-size: 1.05rem;
+  flex-shrink: 0;
+  width: 1.25rem;
+  text-align: center;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Version */
+.version {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.68rem;
+  color: var(--mid-gray);
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar { transition: none; }
+}

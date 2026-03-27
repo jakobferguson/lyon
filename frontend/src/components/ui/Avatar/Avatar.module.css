@@ -1,0 +1,16 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--navy-blue);
+  color: var(--white);
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  border-radius: 50%;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.sm  { width: 1.75rem; height: 1.75rem; font-size: 0.65rem; }
+.md  { width: 2.25rem; height: 2.25rem; font-size: 0.8rem; }
+.lg  { width: 3rem;    height: 3rem;    font-size: 1rem; }
