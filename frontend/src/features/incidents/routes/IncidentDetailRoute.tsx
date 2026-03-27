@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Badge } from '../../../components/ui';
 import { INCIDENT_SEED } from '../types';
 import { STATUS_VARIANT, formatDateLong } from '../utils';
+import { INVESTIGATION_SEED } from '../../investigations/types';
+import { INVESTIGATION_STATUS_VARIANT, formatDateOnly, getEscalationTier } from '../../investigations/utils';
 import styles from './IncidentDetailRoute.module.css';
 
 type Tab = 'details' | 'investigation' | 'capas' | 'recurrence';
@@ -101,12 +103,83 @@ export function IncidentDetailRoute() {
           </div>
         )}
 
-        {tab === 'investigation' && (
-          <div className={styles.comingSoon}>
-            <span>🔍</span>
-            <p>Investigation details will be available in Phase 3.</p>
-          </div>
-        )}
+        {tab === 'investigation' && (() => {
+          const investigation = INVESTIGATION_SEED.find((inv) => inv.incidentId === incident.id);
+          if (!investigation) {
+            return (
+              <div className={styles.comingSoon}>
+                <span>🔍</span>
+                <p>No investigation has been opened for this incident yet.</p>
+              </div>
+            );
+          }
+          const tier = investigation.assignment
+            ? getEscalationTier(investigation.assignment.targetDate, investigation.status)
+            : 'none';
+          return (
+            <div className={styles.investigationSummary}>
+              <div className={styles.invSummaryHeader}>
+                <div className={styles.invSummaryTitle}>
+                  <h2 className={styles.cardTitle}>Investigation Summary</h2>
+                  <Badge variant={INVESTIGATION_STATUS_VARIANT[investigation.status]}>
+                    {investigation.status}
+                  </Badge>
+                  {tier !== 'none' && (
+                    <span className={`${styles.escalationPill} ${styles[tier]}`}>
+                      {tier === 'tier3' ? '🚨' : tier === 'tier2' ? '⚠' : '⏰'} Overdue
+                    </span>
+                  )}
+                </div>
+                <Link
+                  to={`/app/investigations/${investigation.id}`}
+                  className={styles.invLink}
+                >
+                  View Full Investigation →
+                </Link>
+              </div>
+
+              <div className={styles.invSummaryGrid}>
+                <div className={styles.invSummaryCard}>
+                  <span className={styles.invSummaryLabel}>Lead Investigator</span>
+                  <span className={styles.invSummaryValue}>
+                    {investigation.assignment?.leadInvestigator ?? <em>Unassigned</em>}
+                  </span>
+                </div>
+                <div className={styles.invSummaryCard}>
+                  <span className={styles.invSummaryLabel}>Target Date</span>
+                  <span className={styles.invSummaryValue}>
+                    {investigation.assignment
+                      ? formatDateOnly(investigation.assignment.targetDate)
+                      : '—'}
+                  </span>
+                </div>
+                <div className={styles.invSummaryCard}>
+                  <span className={styles.invSummaryLabel}>5-Why Levels</span>
+                  <span className={styles.invSummaryValue}>{investigation.fiveWhys.length}</span>
+                </div>
+                <div className={styles.invSummaryCard}>
+                  <span className={styles.invSummaryLabel}>Witness Statements</span>
+                  <span className={styles.invSummaryValue}>{investigation.witnessStatements.length}</span>
+                </div>
+                <div className={styles.invSummaryCard}>
+                  <span className={styles.invSummaryLabel}>Contributing Factors</span>
+                  <span className={styles.invSummaryValue}>{investigation.contributingFactors.length}</span>
+                </div>
+                <div className={styles.invSummaryCard}>
+                  <span className={styles.invSummaryLabel}>Review Cycles</span>
+                  <span className={styles.invSummaryValue}>{investigation.reviews.length}</span>
+                </div>
+              </div>
+
+              {investigation.rootCauseSummary && (
+                <div className={styles.rootCauseSummaryCard}>
+                  <span className={styles.invSummaryLabel}>Root Cause Summary</span>
+                  <p className={styles.rootCauseText}>{investigation.rootCauseSummary}</p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {tab === 'capas' && (
           <div className={styles.comingSoon}>

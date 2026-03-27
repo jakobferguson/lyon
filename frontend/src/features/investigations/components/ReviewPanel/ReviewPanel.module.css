@@ -1,0 +1,211 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}
+
+/* ── Action area ────────────────────────────────────────────────────────── */
+
+.actionArea {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.approvedState {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.approvedNote {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #aaa);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.actionPrompt {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #aaa);
+  margin: 0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.notReviewable {
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}
+
+.accessNote {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #888);
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-style: italic;
+}
+
+/* ── History ───────────────────────────────────────────────────────────── */
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.historyTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.historyItem {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid;
+}
+
+.historyItem.approved {
+  border-left-color: var(--color-success, #22c55e);
+}
+
+.historyItem.returned {
+  border-left-color: var(--color-overdue, #ea580c);
+}
+
+.historyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.historyMeta {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #888);
+}
+
+.historyComments {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #aaa);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.noHistory {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted, #888);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Modals ─────────────────────────────────────────────────────────────── */
+
+.confirmModal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.confirmText {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary, #aaa);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border, #2a2a2a);
+}
+
+.returnModal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.returnPrompt {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary, #aaa);
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #aaa);
+}
+
+.required {
+  color: var(--color-danger, #dc2626);
+}
+
+.fieldError {
+  font-size: 0.8rem;
+  color: var(--color-danger, #dc2626);
+}
+
+.returnActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border, #2a2a2a);
+}

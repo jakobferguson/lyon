@@ -163,6 +163,102 @@
 
 .comingSoon span { font-size: 2rem; }
 
+/* Investigation summary tab */
+.investigationSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.invSummaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.invSummaryTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.invLink {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  color: var(--navy-blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.invLink:hover { text-decoration: underline; }
+
+.invSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.875rem;
+}
+
+.invSummaryCard {
+  background: var(--white);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.invSummaryLabel {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mid-gray);
+}
+
+.invSummaryValue {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rich-black);
+}
+
+.rootCauseSummaryCard {
+  background: var(--white);
+  border: 1px solid var(--border-gray);
+  border-left: 3px solid var(--navy-blue);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rootCauseText {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.9375rem;
+  color: var(--dark-gray);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.escalationPill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.escalationPill.tier1 { background: #fff8e1; color: #92400e; }
+.escalationPill.tier2 { background: #fff3e0; color: #7c2d12; }
+.escalationPill.tier3 { background: #fef2f2; color: #7f1d1d; }
+
 @media (max-width: 768px) {
   .detailsGrid { grid-template-columns: 1fr; }
+  .invSummaryGrid { grid-template-columns: 1fr 1fr; }
 }

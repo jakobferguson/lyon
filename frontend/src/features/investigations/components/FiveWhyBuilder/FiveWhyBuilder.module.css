@@ -1,0 +1,181 @@
+.builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.builderHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.builderTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0 0 0.25rem;
+}
+
+.builderSubtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.savedIndicator {
+  font-size: 0.8125rem;
+  color: var(--color-success, #22c55e);
+  font-weight: 500;
+}
+
+/* ── Chain ───────────────────────────────────────────────────────────────── */
+
+.chain {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepCard {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stepNumber {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent, #c8a45a);
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #888);
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.removeBtn:hover {
+  color: var(--color-danger, #dc2626);
+  background: var(--color-danger-bg, #fef2f2);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.875rem;
+}
+
+.fieldGroup:last-of-type {
+  margin-bottom: 0;
+}
+
+.fieldLabel {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #aaa);
+}
+
+.optional {
+  color: var(--color-text-muted, #888);
+  font-weight: 400;
+}
+
+.readonlyText {
+  font-size: 0.9375rem;
+  color: var(--color-text-primary, #f5f5f5);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.empty {
+  color: var(--color-text-muted, #888);
+  font-style: italic;
+}
+
+.rootCauseTag {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent, #c8a45a);
+  border: 1px solid var(--color-accent, #c8a45a);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+}
+
+/* ── Connector ───────────────────────────────────────────────────────────── */
+
+.connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.25rem 0;
+  gap: 0;
+}
+
+.connectorLine {
+  width: 2px;
+  height: 1.25rem;
+  background: var(--color-border, #2a2a2a);
+}
+
+.connectorArrow {
+  font-size: 0.625rem;
+  color: var(--color-text-muted, #888);
+  line-height: 1;
+}
+
+/* ── Root cause summary ───────────────────────────────────────────────────── */
+
+.rootCauseSection {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-accent, #c8a45a);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.rootCauseTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0 0 0.25rem;
+}
+
+.rootCauseHint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+  margin: 0 0 0.875rem;
+}
