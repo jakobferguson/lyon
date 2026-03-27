@@ -8,3 +8,5 @@ export type Role =
   | 'admin';
 
 export type Division = 'HCC' | 'HRSI' | 'HSI' | 'HTI' | 'HTSI' | 'Herzog Energy' | 'Green Group';
+
+export const DIVISIONS: Division[] = ['HCC', 'HRSI', 'HSI', 'HTI', 'HTSI', 'Herzog Energy', 'Green Group'];

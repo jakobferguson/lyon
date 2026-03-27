@@ -1,15 +1,9 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Badge } from '../../../components/ui';
 import { INCIDENT_SEED } from '../types';
-import type { IncidentStatus } from '../types';
+import { STATUS_VARIANT, formatDateLong } from '../utils';
 import styles from './IncidentDetailRoute.module.css';
-
-const STATUS_VARIANT: Record<IncidentStatus, 'active' | 'pending' | 'overdue' | 'info' | 'neutral'> = {
-  'Draft': 'neutral', 'Reported': 'info', 'Under Investigation': 'pending',
-  'Investigation Complete': 'pending', 'Investigation Approved': 'active',
-  'CAPA Assigned': 'pending', 'CAPA In Progress': 'pending',
-  'Closed': 'active', 'Reopened': 'overdue',
-};
 
 type Tab = 'details' | 'investigation' | 'capas' | 'recurrence';
 const TABS: { id: Tab; label: string }[] = [
@@ -18,13 +12,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'capas',         label: 'CAPAs' },
   { id: 'recurrence',    label: 'Recurrence' },
 ];
-
-function formatDateTime(dt: string) {
-  return new Date(dt).toLocaleString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
-  });
-}
 
 function DetailRow({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -40,7 +27,7 @@ export function IncidentDetailRoute() {
   const navigate = useNavigate();
   const incident = INCIDENT_SEED.find((i) => i.id === id);
 
-  const [tab, setTab] = React.useState<Tab>('details');
+  const [tab, setTab] = useState<Tab>('details');
 
   if (!incident) {
     return (
@@ -65,7 +52,7 @@ export function IncidentDetailRoute() {
             <h1 className={styles.title}>{incident.incidentNumber}</h1>
             <Badge variant={STATUS_VARIANT[incident.status]}>{incident.status}</Badge>
           </div>
-          <p className={styles.subtitle}>{incident.incidentType} · {formatDateTime(incident.dateTime)}</p>
+          <p className={styles.subtitle}>{incident.incidentType} · {formatDateLong(incident.dateTime)}</p>
         </div>
       </div>
 
@@ -139,5 +126,3 @@ export function IncidentDetailRoute() {
   );
 }
 
-// React import needed for useState inside the component
-import React from 'react';

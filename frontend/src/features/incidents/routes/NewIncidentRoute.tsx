@@ -36,6 +36,7 @@ const DEFAULT_VALUES: IncidentFormValues = {
   isDart: null,
   oshaOverrideJustification: '',
   status: 'Draft',
+  photos: [],
 };
 
 export function NewIncidentRoute() {

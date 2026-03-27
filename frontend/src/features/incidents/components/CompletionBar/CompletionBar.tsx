@@ -1,6 +1,7 @@
 import { useFormContext, useWatch } from 'react-hook-form';
 import { ProgressBar } from '../../../../components/ui';
 import type { IncidentFormValues } from '../../types';
+import styles from './CompletionBar.module.css';
 
 const QUICK_FIELDS: (keyof IncidentFormValues)[] = [
   'incidentType', 'dateTime', 'description',
@@ -30,18 +31,8 @@ export function CompletionBar() {
   const pct = Math.round((filled / allFields.length) * 100);
 
   return (
-    <div>
-      <p style={{
-        fontFamily: 'Roboto, sans-serif',
-        fontSize: '0.75rem',
-        fontWeight: 600,
-        letterSpacing: '0.04em',
-        textTransform: 'uppercase',
-        color: 'var(--mid-gray)',
-        marginBottom: '0.35rem',
-      }}>
-        Report Completion
-      </p>
+    <div className={styles.wrapper}>
+      <p className={styles.label}>Report Completion</p>
       <ProgressBar value={pct} />
     </div>
   );

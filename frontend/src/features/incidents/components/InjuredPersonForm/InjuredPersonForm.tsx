@@ -2,10 +2,8 @@ import { useFormContext } from 'react-hook-form';
 import { FormField } from '../../../../components/ui';
 import { usePermission } from '../../../../hooks/usePermission';
 import type { IncidentFormValues, InjuryType, BodyPart, BodySide, TreatmentType, ReturnToWorkStatus } from '../../types';
-import type { Division } from '../../../../types';
+import { DIVISIONS } from '../../../../types';
 import styles from './InjuredPersonForm.module.css';
-
-const DIVISIONS: Division[] = ['HCC', 'HRSI', 'HSI', 'HTI', 'HTSI', 'Herzog Energy', 'Green Group'];
 const INJURY_TYPES: InjuryType[] = ['Laceration','Fracture','Sprain/Strain','Burn','Contusion','Amputation','Concussion','Illness','Other'];
 const BODY_PARTS: BodyPart[] = ['Head','Eye','Neck','Shoulder','Arm','Elbow','Wrist','Hand','Finger','Chest','Back','Hip','Leg','Knee','Ankle','Foot','Toe','Multiple'];
 const SIDES: BodySide[] = ['Left','Right','Bilateral','N/A'];

@@ -44,31 +44,7 @@
   line-height: 1.4;
 }
 
-/* Shared input/select/textarea styling — apply via global class */
-:global(.lyon-input) {
-  font-family: 'Roboto', sans-serif;
-  font-size: 0.85rem;
-  color: var(--dark-gray);
-  background-color: var(--white);
-  border: 1px solid var(--input-border);
-  border-radius: 5px;
-  padding: 0.5rem 0.65rem;
-  width: 100%;
-  transition: border-color 0.15s ease;
-}
-
-:global(.lyon-input:focus) {
-  outline: 2px solid var(--navy-blue);
-  outline-offset: 1px;
-  border-color: var(--navy-blue);
-}
-
-:global(.lyon-input:disabled) {
-  background-color: var(--light-gray);
-  color: var(--mid-gray);
-  cursor: not-allowed;
-}
-
+/* Error state: red border on any lyon-input inside a hasError field */
 .hasError :global(.lyon-input) {
   border-color: var(--error-red);
 }

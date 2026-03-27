@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { FormField, Button } from '../../../../components/ui';
+import { FormField, Button, Tooltip } from '../../../../components/ui';
 import { LocationPicker } from '../LocationPicker/LocationPicker';
 import { PhotoUpload } from '../PhotoUpload/PhotoUpload';
 import { OshaWizard } from '../OshaWizard/OshaWizard';
@@ -8,14 +8,13 @@ import { RailroadNotificationForm } from '../RailroadNotificationForm/RailroadNo
 import { InjuredPersonForm } from '../InjuredPersonForm/InjuredPersonForm';
 import { CompletionBar } from '../CompletionBar/CompletionBar';
 import type { IncidentFormValues, IncidentType, Severity, ShiftType, WeatherCondition } from '../../types';
-import type { Division } from '../../../../types';
+import { DIVISIONS } from '../../../../types';
 import styles from './IncidentForm.module.css';
 
 const INCIDENT_TYPES: IncidentType[] = ['Injury','Near Miss','Property Damage','Environmental','Vehicle','Fire','Utility Strike'];
 const SEVERITIES: Severity[] = ['Fatality','Lost Time','Medical Treatment','First Aid','Near Miss'];
 const SHIFTS: ShiftType[] = ['Day','Night','Swing'];
 const WEATHERS: WeatherCondition[] = ['Clear','Rain','Snow','Ice','Fog','Wind','Extreme Heat','Extreme Cold'];
-const DIVISIONS: Division[] = ['HCC','HRSI','HSI','HTI','HTSI','Herzog Energy','Green Group'];
 
 interface Section {
   id: string;
@@ -50,9 +49,8 @@ function QuickReportSection() {
       </FormField>
 
       <div className={styles.fullWidth}>
-        <FormField label="Location" required error={errors.location?.textDescription?.message}>
-          {() => <LocationPicker />}
-        </FormField>
+        {/* LocationPicker renders its own labelled textarea internally */}
+        <LocationPicker />
       </div>
 
       <div className={styles.fullWidth}>
@@ -197,7 +195,10 @@ export function IncidentForm() {
     { id: 'photos',   label: '5. Photos',                content: <PhotoSection /> },
   ];
 
-  function onSubmit() {
+  function onSubmit(data: IncidentFormValues) {
+    if (import.meta.env.DEV) {
+      console.log('[Dev] Incident form submitted:', data);
+    }
     setSubmitted(true);
   }
 
@@ -245,7 +246,11 @@ export function IncidentForm() {
       </div>
 
       <div className={styles.formActions}>
-        <Button type="button" variant="secondary">Save Draft</Button>
+        <Tooltip content="Save Draft will be available once the API is connected." side="top">
+          <span>
+            <Button type="button" variant="secondary" disabled>Save Draft</Button>
+          </span>
+        </Tooltip>
         <Button type="submit" variant="accent">Submit Report</Button>
       </div>
     </form>

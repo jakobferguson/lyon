@@ -1,21 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, type BadgeVariant } from '../../../../components/ui';
+import { Badge } from '../../../../components/ui';
 import type { IncidentStatus, IncidentType } from '../../types';
 import { INCIDENT_SEED } from '../../types';
+import { STATUS_VARIANT, formatDateShort } from '../../utils';
 import styles from './IncidentTable.module.css';
-
-const STATUS_VARIANT: Record<IncidentStatus, BadgeVariant> = {
-  'Draft':                   'neutral',
-  'Reported':                'info',
-  'Under Investigation':     'pending',
-  'Investigation Complete':  'pending',
-  'Investigation Approved':  'active',
-  'CAPA Assigned':           'pending',
-  'CAPA In Progress':        'pending',
-  'Closed':                  'active',
-  'Reopened':                'overdue',
-};
 
 const INCIDENT_TYPES: IncidentType[] = [
   'Injury', 'Near Miss', 'Property Damage', 'Environmental', 'Vehicle', 'Fire', 'Utility Strike',
@@ -25,13 +14,6 @@ const STATUSES: IncidentStatus[] = [
   'Draft', 'Reported', 'Under Investigation', 'Investigation Complete',
   'Investigation Approved', 'CAPA Assigned', 'CAPA In Progress', 'Closed', 'Reopened',
 ];
-
-function formatDateTime(dt: string) {
-  return new Date(dt).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit',
-  });
-}
 
 export function IncidentTable() {
   const navigate = useNavigate();
@@ -122,7 +104,7 @@ export function IncidentTable() {
                 >
                   <td className={styles.number}>{inc.incidentNumber}</td>
                   <td>{inc.incidentType}</td>
-                  <td className={styles.date}>{formatDateTime(inc.dateTime)}</td>
+                  <td className={styles.date}>{formatDateShort(inc.dateTime)}</td>
                   <td>{inc.division || '—'}</td>
                   <td className={styles.project}>{inc.project}</td>
                   <td>{inc.severity || '—'}</td>

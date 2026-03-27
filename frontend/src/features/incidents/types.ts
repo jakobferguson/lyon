@@ -134,6 +134,9 @@ export interface IncidentFormValues {
 
   // Status
   status: IncidentStatus;
+
+  // Photos (File objects, not persisted to form storage)
+  photos: File[];
 }
 
 // ── List / display entity ──────────────────────────────────────────────────

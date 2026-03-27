@@ -1,4 +1,6 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
+import type { IncidentFormValues } from '../../types';
 import styles from './PhotoUpload.module.css';
 
 const MAX_PHOTOS = 15;
@@ -9,13 +11,27 @@ interface PhotoPreview {
   id: string;
   name: string;
   url: string;
+  file: File;
   sizeKb: number;
 }
 
 export function PhotoUpload() {
+  const { setValue } = useFormContext<IncidentFormValues>();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [photos, setPhotos]   = useState<PhotoPreview[]>([]);
-  const [errors, setErrors]   = useState<string[]>([]);
+  const [photos, setPhotos] = useState<PhotoPreview[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  // Revoke all blob URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    const currentPhotos = photos;
+    return () => {
+      currentPhotos.forEach((p) => URL.revokeObjectURL(p.url));
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function syncToForm(next: PhotoPreview[]) {
+    setValue('photos', next.map((p) => p.file), { shouldDirty: true });
+  }
 
   function handleFiles(files: FileList | null) {
     if (!files) return;
@@ -39,16 +55,27 @@ export function PhotoUpload() {
         id: `${Date.now()}-${Math.random()}`,
         name: file.name,
         url: URL.createObjectURL(file),
+        file,
         sizeKb: Math.round(file.size / 1024),
       });
     });
 
     setErrors(newErrors);
-    setPhotos((prev) => [...prev, ...newPhotos].slice(0, MAX_PHOTOS));
+    setPhotos((prev) => {
+      const next = [...prev, ...newPhotos].slice(0, MAX_PHOTOS);
+      syncToForm(next);
+      return next;
+    });
   }
 
   function remove(id: string) {
-    setPhotos((prev) => prev.filter((p) => p.id !== id));
+    setPhotos((prev) => {
+      const target = prev.find((p) => p.id === id);
+      if (target) URL.revokeObjectURL(target.url);
+      const next = prev.filter((p) => p.id !== id);
+      syncToForm(next);
+      return next;
+    });
   }
 
   const remaining = MAX_PHOTOS - photos.length;
