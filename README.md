@@ -11,18 +11,30 @@ Lyon is an internal web application built for Herzog, a North American rail and 
 - **Backend:** ASP.NET Core 8 Web API (separate repo)
 - **Database:** PostgreSQL + PostGIS
 
-## Getting Started
+## Repository Structure
+
+```
+lyon/
+  frontend/      # React + TypeScript + Vite application
+  backend/       # ASP.NET Core 8 Web API (coming soon)
+  README.md
+  FrontEndPlan.md
+  ExtendedRequirements.md
+```
+
+## Getting Started (Frontend)
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-## Project Structure
+## Frontend Structure
 
 ```
-src/
-  app/           # Providers, router
+frontend/src/
+  app/           # Providers, router, auth
   components/    # Shared UI components and layouts
   config/        # App-level constants
   features/      # Feature modules (incidents, investigations, capas, dashboard, admin)

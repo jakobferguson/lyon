@@ -1,0 +1,19 @@
+.spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid var(--border-gray);
+  border-top-color: var(--navy-blue);
+  animation: spin 0.7s linear infinite;
+}
+
+.sm { width: 1rem; height: 1rem; }
+.md { width: 1.5rem; height: 1.5rem; }
+.lg { width: 2.25rem; height: 2.25rem; border-width: 3px; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 0.01ms; }
+}

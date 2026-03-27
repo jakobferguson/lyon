@@ -39,6 +39,11 @@
   /* Data viz */
   --chart-purple: #6B4C9A;
   --chart-slate: #4A6274;
+
+  /* App shell */
+  --sidebar-width: 200px;
+  --sidebar-collapsed-width: 56px;
+  --topbar-height: 56px;
 }
 
 /* ──────────────────────────────────────────
