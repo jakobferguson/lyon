@@ -80,6 +80,8 @@
   padding: 0.65rem 1.5rem;
   border-radius: 5px;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 

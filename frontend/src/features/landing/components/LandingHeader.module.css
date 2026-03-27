@@ -83,6 +83,8 @@
   border-radius: 5px;
   margin-left: 0.5rem;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
