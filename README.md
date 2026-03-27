@@ -1,73 +1,36 @@
-# React + TypeScript + Vite
+# Lyon — SRD-10 Incident Investigation & Corrective Action System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Lyon is an internal web application built for Herzog, a North American rail and heavy/highway infrastructure contractor. It serves as the centralized platform for railroad incident reporting, 5-Why root cause investigation, corrective and preventive action (CAPA) management, and safety performance dashboards — covering TRIR, DART, and leading indicator metrics. The system supports approximately 5,000 users across Herzog's seven divisions operating in the United States, Canada, and Mexico, with role-based access control ranging from field reporters to executives and full HIPAA compliance for medical data handling.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend:** React 19 + TypeScript + Vite
+- **State / Data:** TanStack Query, Zustand
+- **Routing:** React Router v7
+- **Auth:** Azure AD SSO (MSAL)
+- **Backend:** ASP.NET Core 8 Web API (separate repo)
+- **Database:** PostgreSQL + PostGIS
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+  app/           # Providers, router
+  components/    # Shared UI components and layouts
+  config/        # App-level constants
+  features/      # Feature modules (incidents, investigations, capas, dashboard, admin)
+  hooks/         # Shared hooks
+  lib/           # Library configuration (React Query, MSAL)
+  stores/        # Zustand stores
+  types/         # Global TypeScript types
+  utils/         # Utility functions
+```
+
+See `FrontEndPlan.md` for the full phased build plan.
