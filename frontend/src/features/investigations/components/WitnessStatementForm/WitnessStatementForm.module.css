@@ -1,0 +1,189 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}
+
+.empty {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted, #888);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Statement cards ────────────────────────────────────────────────────── */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.statementCard {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.statementHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 1rem;
+}
+
+.statementHeader:hover {
+  background: var(--color-surface-elevated, #222);
+}
+
+.statementMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.witnessName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+}
+
+.witnessSub {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+}
+
+.statementRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.collectionDate {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+}
+
+.expandIcon {
+  font-size: 0.625rem;
+  color: var(--color-text-muted, #888);
+}
+
+.statementBody {
+  border-top: 1px solid var(--color-border, #2a2a2a);
+  padding: 1rem;
+}
+
+.statementText {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0 0 1rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--color-border, #2a2a2a);
+  font-style: italic;
+}
+
+.statementFooter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #888);
+  align-items: center;
+}
+
+.immutableNote {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #888);
+  font-style: italic;
+}
+
+/* ── Modal form ─────────────────────────────────────────────────────────── */
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+}
+
+@media (max-width: 600px) {
+  .modalGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #aaa);
+}
+
+.required {
+  color: var(--color-danger, #dc2626);
+}
+
+.fieldError {
+  font-size: 0.8rem;
+  color: var(--color-danger, #dc2626);
+}
+
+.immutableWarning {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #888);
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  margin: 0;
+  font-style: italic;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border, #2a2a2a);
+}
