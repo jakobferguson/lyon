@@ -36,7 +36,7 @@ export function AdminGeofencesRoute() {
   function handleSave() {
     if (!form.name.trim()) return;
     if (isNew) {
-      setZones((prev) => [...prev, { ...form, id: `gf-${Date.now()}` }]);
+      setZones((prev) => [...prev, { ...form, id: crypto.randomUUID() }]);
     } else if (editing) {
       setZones((prev) => prev.map((z) => (z.id === editing.id ? { ...z, ...form } : z)));
     }
@@ -44,6 +44,7 @@ export function AdminGeofencesRoute() {
   }
 
   function handleDelete(id: string) {
+    if (!window.confirm('Are you sure you want to delete this geofence zone? This action cannot be undone.')) return;
     setZones((prev) => prev.filter((z) => z.id !== id));
   }
 

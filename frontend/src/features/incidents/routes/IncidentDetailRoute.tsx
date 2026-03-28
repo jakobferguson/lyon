@@ -58,7 +58,7 @@ export function IncidentDetailRoute() {
     setTimeout(() => {
       setPdfState('success');
       addNotification({
-        eventType: 'incident_reported',
+        eventType: 'report_generated',
         title: 'Incident Report Generated',
         summary: `PDF report for ${incident?.incidentNumber ?? id} was successfully generated.`,
         linkTo: `/app/incidents/${id}`,

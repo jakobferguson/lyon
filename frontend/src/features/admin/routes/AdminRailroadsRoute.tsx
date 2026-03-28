@@ -39,7 +39,7 @@ export function AdminRailroadsRoute() {
   function handleSave() {
     if (!form.name.trim() || !form.shortCode.trim()) return;
     if (isNew) {
-      const newRR: Railroad = { ...form, id: `rr-${Date.now()}` };
+      const newRR: Railroad = { ...form, id: crypto.randomUUID() };
       setRailroads((prev) => [...prev, newRR]);
     } else if (editing) {
       setRailroads((prev) =>
@@ -50,6 +50,7 @@ export function AdminRailroadsRoute() {
   }
 
   function handleDelete(id: string) {
+    if (!window.confirm('Are you sure you want to delete this railroad? This action cannot be undone.')) return;
     setRailroads((prev) => prev.filter((r) => r.id !== id));
   }
 
@@ -86,7 +87,7 @@ export function AdminRailroadsRoute() {
           <tbody>
             {railroads.map((rr) => (
               <tr key={rr.id}>
-                <td className={styles.nameCel}>{rr.name}</td>
+                <td className={styles.nameCell}>{rr.name}</td>
                 <td><span className={styles.code}>{rr.shortCode}</span></td>
                 {INCIDENT_TYPES.map((t) => (
                   <td key={t}>{rr.rules[t] ?? '—'}</td>

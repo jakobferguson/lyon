@@ -9,7 +9,8 @@ export type NotificationEventType =
   | 'capa_assigned'
   | 'capa_overdue'
   | 'capa_ineffective'
-  | 'railroad_overdue';
+  | 'railroad_overdue'
+  | 'report_generated';
 
 // ── Event icons ───────────────────────────────────────────────────────────
 
@@ -23,6 +24,7 @@ export const EVENT_ICONS: Record<NotificationEventType, string> = {
   capa_overdue:            '🕐',
   capa_ineffective:        '❌',
   railroad_overdue:        '🚂',
+  report_generated:        '📄',
 };
 
 // ── Entity ────────────────────────────────────────────────────────────────

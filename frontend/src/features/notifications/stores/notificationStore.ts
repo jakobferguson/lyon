@@ -31,7 +31,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
     set((state) => {
       const newNotification: AppNotification = {
         ...partial,
-        id: `notif-${Date.now()}`,
+        id: crypto.randomUUID(),
         read: false,
         createdAt: new Date().toISOString(),
       };

@@ -53,7 +53,7 @@ export function AdminFactorsRoute() {
     if (isNew) {
       setFactors((prev) => [
         ...prev,
-        { id: `f-${Date.now()}`, category: form.category, label: form.label, active: true },
+        { id: crypto.randomUUID(), category: form.category, label: form.label, active: true },
       ]);
     } else if (editing) {
       setFactors((prev) =>

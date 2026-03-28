@@ -9,7 +9,9 @@ interface Props {
 }
 
 export function NotificationDrawer({ open, onClose }: Props) {
-  const { notifications, unreadCount, markAllRead } = useNotificationStore();
+  const notifications = useNotificationStore((s) => s.notifications);
+  const unreadCount   = useNotificationStore((s) => s.unreadCount);
+  const markAllRead   = useNotificationStore((s) => s.markAllRead);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Close on outside click

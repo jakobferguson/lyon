@@ -9,7 +9,7 @@ import styles from './AppShell.module.css';
 export function AppShell() {
   const [collapsed, setCollapsed] = useState(false);
   const notifications = useNotificationStore((s) => s.notifications);
-  const tier3 = notifications.find((n) => n.tier === 3 && !n.read);
+  const tier3Notifications = notifications.filter((n) => n.tier === 3 && !n.read);
 
   return (
     <div className={styles.shell}>
@@ -19,7 +19,9 @@ export function AppShell() {
         <TopBar onToggleSidebar={() => setCollapsed((c) => !c)} />
 
         <div id="persistent-banner-slot">
-          {tier3 && <PersistentBanner message={tier3.summary} />}
+          {tier3Notifications.map((n) => (
+            <PersistentBanner key={n.id} message={n.summary} />
+          ))}
         </div>
 
         <div id="main-content" className={styles.content}>

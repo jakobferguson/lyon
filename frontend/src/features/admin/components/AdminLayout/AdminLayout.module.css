@@ -58,8 +58,8 @@
 
 .navLinkActive {
   background-color: rgba(29, 78, 216, 0.15);
-  color: #93c5fd;
-  border-left-color: #3b82f6;
+  color: var(--color-accent-light, #93c5fd);
+  border-left-color: var(--color-accent-blue, #3b82f6);
   font-weight: 500;
 }
 

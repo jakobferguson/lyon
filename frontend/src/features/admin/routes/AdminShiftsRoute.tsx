@@ -30,7 +30,7 @@ export function AdminShiftsRoute() {
   function handleSave() {
     if (!form.name.trim()) return;
     if (isNew) {
-      setShifts((prev) => [...prev, { ...form, id: `sw-${Date.now()}` }]);
+      setShifts((prev) => [...prev, { ...form, id: crypto.randomUUID() }]);
     } else if (editing) {
       setShifts((prev) =>
         prev.map((s) => (s.id === editing.id ? { ...s, ...form } : s)),
@@ -40,6 +40,7 @@ export function AdminShiftsRoute() {
   }
 
   function handleDelete(id: string) {
+    if (!window.confirm('Are you sure you want to delete this shift? This action cannot be undone.')) return;
     setShifts((prev) => prev.filter((s) => s.id !== id));
   }
 
