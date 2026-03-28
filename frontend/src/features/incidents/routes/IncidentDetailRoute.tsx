@@ -32,10 +32,136 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
+const TIER_CLASS: Record<string, string | undefined> = {
+  tier1: styles.tier1,
+  tier2: styles.tier2,
+  tier3: styles.tier3,
+};
+
 type PdfState = 'idle' | 'confirming' | 'generating' | 'success';
 
 const COORDINATOR_PLUS_ROLES = ['safety_coordinator', 'safety_manager', 'division_manager', 'executive', 'admin'];
 const MEDICAL_ACCESS_ROLES   = ['safety_manager', 'division_manager', 'executive', 'admin'];
+
+function InvestigationSummaryTab({ incidentId }: { incidentId: string }) {
+  const investigation = INVESTIGATION_SEED.find((inv) => inv.incidentId === incidentId);
+  if (!investigation) {
+    return (
+      <div className={styles.comingSoon}>
+        <span>🔍</span>
+        <p>No investigation has been opened for this incident yet.</p>
+      </div>
+    );
+  }
+  const tier = investigation.assignment
+    ? getEscalationTier(investigation.assignment.targetDate, investigation.status)
+    : 'none';
+  return (
+    <div className={styles.investigationSummary}>
+      <div className={styles.invSummaryHeader}>
+        <div className={styles.invSummaryTitle}>
+          <h2 className={styles.cardTitle}>Investigation Summary</h2>
+          <Badge variant={INVESTIGATION_STATUS_VARIANT[investigation.status]}>
+            {investigation.status}
+          </Badge>
+          {tier !== 'none' && (
+            <span className={`${styles.escalationPill} ${TIER_CLASS[tier] ?? ''}`}>
+              {tier === 'tier3' ? '🚨' : tier === 'tier2' ? '⚠' : '⏰'} Overdue
+            </span>
+          )}
+        </div>
+        <Link
+          to={`/app/investigations/${investigation.id}`}
+          className={styles.invLink}
+        >
+          View Full Investigation →
+        </Link>
+      </div>
+
+      <div className={styles.invSummaryGrid}>
+        <div className={styles.invSummaryCard}>
+          <span className={styles.invSummaryLabel}>Lead Investigator</span>
+          <span className={styles.invSummaryValue}>
+            {investigation.assignment?.leadInvestigator ?? <em>Unassigned</em>}
+          </span>
+        </div>
+        <div className={styles.invSummaryCard}>
+          <span className={styles.invSummaryLabel}>Target Date</span>
+          <span className={styles.invSummaryValue}>
+            {investigation.assignment
+              ? formatDateOnly(investigation.assignment.targetDate)
+              : '—'}
+          </span>
+        </div>
+        <div className={styles.invSummaryCard}>
+          <span className={styles.invSummaryLabel}>5-Why Levels</span>
+          <span className={styles.invSummaryValue}>{investigation.fiveWhys.length}</span>
+        </div>
+        <div className={styles.invSummaryCard}>
+          <span className={styles.invSummaryLabel}>Witness Statements</span>
+          <span className={styles.invSummaryValue}>{investigation.witnessStatements.length}</span>
+        </div>
+        <div className={styles.invSummaryCard}>
+          <span className={styles.invSummaryLabel}>Contributing Factors</span>
+          <span className={styles.invSummaryValue}>{investigation.contributingFactors.length}</span>
+        </div>
+        <div className={styles.invSummaryCard}>
+          <span className={styles.invSummaryLabel}>Review Cycles</span>
+          <span className={styles.invSummaryValue}>{investigation.reviews.length}</span>
+        </div>
+      </div>
+
+      {investigation.rootCauseSummary && (
+        <div className={styles.rootCauseSummaryCard}>
+          <span className={styles.invSummaryLabel}>Root Cause Summary</span>
+          <p className={styles.rootCauseText}>{investigation.rootCauseSummary}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CapasTab({ incidentId }: { incidentId: string }) {
+  const navigate = useNavigate();
+  const linkedCapas = CAPA_SEED.filter((c) => c.linkedIncidentIds.includes(incidentId));
+  return (
+    <div className={styles.capasTab}>
+      <div className={styles.capaTabHeader}>
+        <span className={styles.capaCount}>{linkedCapas.length} CAPA{linkedCapas.length !== 1 ? 's' : ''} linked to this incident</span>
+        <Button variant="accent" onClick={() => navigate('/app/capas/new')}>+ New CAPA</Button>
+      </div>
+      {linkedCapas.length === 0 ? (
+        <div className={styles.comingSoon}>
+          <span>✅</span>
+          <p>No CAPAs have been linked to this incident yet.</p>
+        </div>
+      ) : (
+        <div className={styles.capaList}>
+          {linkedCapas.map((capa) => {
+            const overdue = isOverdue(capa);
+            return (
+              <Link key={capa.id} to={`/app/capas/${capa.id}`} className={styles.capaCard}>
+                <div className={styles.capaCardHeader}>
+                  <span className={styles.capaNum}>{capa.capaNumber}</span>
+                  <div className={styles.capaBadges}>
+                    <Badge variant={PRIORITY_VARIANT[capa.priority]}>{capa.priority}</Badge>
+                    <Badge variant={CAPA_STATUS_VARIANT[capa.status]}>{capa.status}</Badge>
+                    {overdue && <Badge variant="overdue">Overdue</Badge>}
+                  </div>
+                </div>
+                <p className={styles.capaDesc}>{capa.description}</p>
+                <div className={styles.capaMeta}>
+                  <span>{capa.type} · {capa.category}</span>
+                  <span>Assigned to {capa.assignedTo}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function IncidentDetailRoute() {
   const { id } = useParams<{ id: string }>();
@@ -188,126 +314,9 @@ export function IncidentDetailRoute() {
           </div>
         )}
 
-        {tab === 'investigation' && (() => {
-          const investigation = INVESTIGATION_SEED.find((inv) => inv.incidentId === incident.id);
-          if (!investigation) {
-            return (
-              <div className={styles.comingSoon}>
-                <span>🔍</span>
-                <p>No investigation has been opened for this incident yet.</p>
-              </div>
-            );
-          }
-          const tier = investigation.assignment
-            ? getEscalationTier(investigation.assignment.targetDate, investigation.status)
-            : 'none';
-          return (
-            <div className={styles.investigationSummary}>
-              <div className={styles.invSummaryHeader}>
-                <div className={styles.invSummaryTitle}>
-                  <h2 className={styles.cardTitle}>Investigation Summary</h2>
-                  <Badge variant={INVESTIGATION_STATUS_VARIANT[investigation.status]}>
-                    {investigation.status}
-                  </Badge>
-                  {tier !== 'none' && (
-                    <span className={`${styles.escalationPill} ${styles[tier]}`}>
-                      {tier === 'tier3' ? '🚨' : tier === 'tier2' ? '⚠' : '⏰'} Overdue
-                    </span>
-                  )}
-                </div>
-                <Link
-                  to={`/app/investigations/${investigation.id}`}
-                  className={styles.invLink}
-                >
-                  View Full Investigation →
-                </Link>
-              </div>
+        {tab === 'investigation' && <InvestigationSummaryTab incidentId={incident.id} />}
 
-              <div className={styles.invSummaryGrid}>
-                <div className={styles.invSummaryCard}>
-                  <span className={styles.invSummaryLabel}>Lead Investigator</span>
-                  <span className={styles.invSummaryValue}>
-                    {investigation.assignment?.leadInvestigator ?? <em>Unassigned</em>}
-                  </span>
-                </div>
-                <div className={styles.invSummaryCard}>
-                  <span className={styles.invSummaryLabel}>Target Date</span>
-                  <span className={styles.invSummaryValue}>
-                    {investigation.assignment
-                      ? formatDateOnly(investigation.assignment.targetDate)
-                      : '—'}
-                  </span>
-                </div>
-                <div className={styles.invSummaryCard}>
-                  <span className={styles.invSummaryLabel}>5-Why Levels</span>
-                  <span className={styles.invSummaryValue}>{investigation.fiveWhys.length}</span>
-                </div>
-                <div className={styles.invSummaryCard}>
-                  <span className={styles.invSummaryLabel}>Witness Statements</span>
-                  <span className={styles.invSummaryValue}>{investigation.witnessStatements.length}</span>
-                </div>
-                <div className={styles.invSummaryCard}>
-                  <span className={styles.invSummaryLabel}>Contributing Factors</span>
-                  <span className={styles.invSummaryValue}>{investigation.contributingFactors.length}</span>
-                </div>
-                <div className={styles.invSummaryCard}>
-                  <span className={styles.invSummaryLabel}>Review Cycles</span>
-                  <span className={styles.invSummaryValue}>{investigation.reviews.length}</span>
-                </div>
-              </div>
-
-              {investigation.rootCauseSummary && (
-                <div className={styles.rootCauseSummaryCard}>
-                  <span className={styles.invSummaryLabel}>Root Cause Summary</span>
-                  <p className={styles.rootCauseText}>{investigation.rootCauseSummary}</p>
-                </div>
-              )}
-            </div>
-          );
-        })()}
-
-        {tab === 'capas' && (() => {
-          const linkedCapas = CAPA_SEED.filter((c) => c.linkedIncidentIds.includes(incident.id));
-          return (
-            <div className={styles.capasTab}>
-              <div className={styles.capaTabHeader}>
-                <span className={styles.capaCount}>{linkedCapas.length} CAPA{linkedCapas.length !== 1 ? 's' : ''} linked to this incident</span>
-                <Link to="/app/capas/new">
-                  <Button variant="accent">+ New CAPA</Button>
-                </Link>
-              </div>
-              {linkedCapas.length === 0 ? (
-                <div className={styles.comingSoon}>
-                  <span>✅</span>
-                  <p>No CAPAs have been linked to this incident yet.</p>
-                </div>
-              ) : (
-                <div className={styles.capaList}>
-                  {linkedCapas.map((capa) => {
-                    const overdue = isOverdue(capa);
-                    return (
-                      <Link key={capa.id} to={`/app/capas/${capa.id}`} className={styles.capaCard}>
-                        <div className={styles.capaCardHeader}>
-                          <span className={styles.capaNum}>{capa.capaNumber}</span>
-                          <div className={styles.capaBadges}>
-                            <Badge variant={PRIORITY_VARIANT[capa.priority]}>{capa.priority}</Badge>
-                            <Badge variant={CAPA_STATUS_VARIANT[capa.status]}>{capa.status}</Badge>
-                            {overdue && <Badge variant="overdue">Overdue</Badge>}
-                          </div>
-                        </div>
-                        <p className={styles.capaDesc}>{capa.description}</p>
-                        <div className={styles.capaMeta}>
-                          <span>{capa.type} · {capa.category}</span>
-                          <span>Assigned to {capa.assignedTo}</span>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })()}
+        {tab === 'capas' && <CapasTab incidentId={incident.id} />}
 
         {tab === 'recurrence' && (
           <div className={styles.recurrenceTab}>

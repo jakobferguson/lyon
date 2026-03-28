@@ -1,4 +1,4 @@
-import type { MonthlyIncidentRecord, DashboardFilters, HoursWorkedEntry } from './types';
+import type { MonthlyIncidentRecord, DashboardFilters, HoursWorkedEntry, SeverityRecord } from './types';
 import { MONTHLY_INCIDENT_SEED, HOURS_WORKED_SEED } from './types';
 import { INVESTIGATION_SEED } from '../investigations/types';
 import { CAPA_SEED } from '../capas/types';
@@ -6,14 +6,17 @@ import { INCIDENT_SEED } from '../incidents/types';
 
 // ── TRIR / DART ───────────────────────────────────────────────────────────
 
+/** OSHA standard: rates are per 200,000 hours worked (100 full-time employees × 2,000 hrs/yr). */
+const OSHA_HOURS_FACTOR = 200_000;
+
 export function calcTrir(recordableCount: number, hoursWorked: number): number {
   if (hoursWorked === 0) return 0;
-  return (recordableCount * 200_000) / hoursWorked;
+  return (recordableCount * OSHA_HOURS_FACTOR) / hoursWorked;
 }
 
 export function calcDart(dartCases: number, hoursWorked: number): number {
   if (hoursWorked === 0) return 0;
-  return (dartCases * 200_000) / hoursWorked;
+  return (dartCases * OSHA_HOURS_FACTOR) / hoursWorked;
 }
 
 export function formatRate(rate: number): string {
@@ -47,9 +50,9 @@ export interface KpiData {
   hoursAvailable:   boolean;
 }
 
-export function computeKpiData(filters: DashboardFilters): KpiData {
+export function computeKpiData(filters: DashboardFilters, hoursEntries: HoursWorkedEntry[] = HOURS_WORKED_SEED): KpiData {
   const filtered   = filterMonthly(MONTHLY_INCIDENT_SEED, filters);
-  const totalHours = getTotalHours();
+  const totalHours = hoursEntries.reduce((s, h) => s + h.companyWide, 0);
   const hoursAvailable = totalHours > 0;
 
   const totalRecordable = filtered.reduce((s, r) => s + r.totalRecordable, 0);
@@ -83,10 +86,6 @@ export function computeKpiData(filters: DashboardFilters): KpiData {
     trir, trirPrev, dartRate, dartRatePrev, nearMissRatio,
     openInvestigations, openCapas, lostWorkDaysYtd, hoursAvailable,
   };
-}
-
-function getTotalHours(): number {
-  return HOURS_WORKED_SEED.reduce((s, h) => s + h.companyWide, 0);
 }
 
 function getPriorPeriod(filters: DashboardFilters): MonthlyIncidentRecord[] {
@@ -195,6 +194,39 @@ export function computeLeadingIndicators(): LeadingIndicator[] {
   ];
 }
 
+// ── Severity distribution (filter-aware) ─────────────────────────────
+
+const SEVERITY_COLORS: Record<string, string> = {
+  'Lost Time':         '#dc2626',
+  'Medical Treatment': '#ea580c',
+  'First Aid':         '#f59e0b',
+  'Near Miss':         '#c8a45a',
+};
+
+export function computeSeverityData(filters: DashboardFilters): SeverityRecord[] {
+  const filtered = INCIDENT_SEED.filter((inc) => {
+    if (filters.division     && inc.division     !== filters.division)     return false;
+    if (filters.incidentType && inc.incidentType !== filters.incidentType) return false;
+    if (filters.dateFrom && inc.dateTime < filters.dateFrom) return false;
+    if (filters.dateTo   && inc.dateTime > filters.dateTo)   return false;
+    return true;
+  });
+
+  const counts: Record<string, number> = {};
+  for (const inc of filtered) {
+    const sev = inc.severity || 'Near Miss';
+    counts[sev] = (counts[sev] || 0) + 1;
+  }
+
+  return Object.entries(SEVERITY_COLORS)
+    .map(([severity, fill]) => ({
+      severity: severity as SeverityRecord['severity'],
+      count: counts[severity] || 0,
+      fill,
+    }))
+    .filter((r) => r.count > 0);
+}
+
 // ── Recent incidents ──────────────────────────────────────────────────────
 
 export function getRecentIncidents(filters: DashboardFilters) {
@@ -219,8 +251,8 @@ export function getLatestHoursEntry(): HoursWorkedEntry | null {
 
 // ── Avg hours per month (for TRIR trend chart) ────────────────────────────
 
-export function getAvgMonthlyHours(): number {
-  const total = getTotalHours();
+export function getAvgMonthlyHours(hoursEntries: HoursWorkedEntry[] = HOURS_WORKED_SEED): number {
+  const total = hoursEntries.reduce((s, h) => s + h.companyWide, 0);
   const months = MONTHLY_INCIDENT_SEED.length;
   return months > 0 ? Math.round(total / months) : 100_000;
 }

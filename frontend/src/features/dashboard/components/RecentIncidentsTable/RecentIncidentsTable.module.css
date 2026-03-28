@@ -59,13 +59,13 @@
 .row:hover { background: var(--color-surface-elevated, #222); }
 .row:focus-visible { outline: 2px solid var(--color-accent, #c8a45a); outline-offset: -2px; }
 
-.incNum { font-weight: 600; color: var(--color-accent, #c8a45a) !important; }
+.incNum { font-weight: 600; color: var(--color-accent, #c8a45a); }
 
 .na { color: var(--color-text-muted, #888); }
 
 .empty {
   text-align: center;
   color: var(--color-text-muted, #888);
-  padding: 2rem !important;
+  padding: 2rem;
   font-style: italic;
 }

@@ -59,9 +59,9 @@
 }
 
 .dotDanger {
-  background: var(--color-danger, #dc2626) !important;
-  color: #fff !important;
-  border-color: var(--color-danger, #dc2626) !important;
+  background: var(--color-danger, #dc2626);
+  color: #fff;
+  border-color: var(--color-danger, #dc2626);
 }
 
 .stepLabel {

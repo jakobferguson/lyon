@@ -3,6 +3,7 @@ import { Modal, Button, FormField } from '../../../../components/ui';
 import type { Division } from '../../../../types';
 import type { HoursWorkedEntry } from '../../types';
 import { HOURS_WORKED_SEED } from '../../types';
+import { useAuthStore } from '../../../../stores/authStore';
 import styles from './HoursWorkedForm.module.css';
 
 const DIVISIONS: Division[] = ['HCC', 'HRSI', 'HSI', 'HTI', 'HTSI', 'Herzog Energy', 'Green Group'];
@@ -14,6 +15,7 @@ interface HoursWorkedFormProps {
 }
 
 export function HoursWorkedForm({ open, onClose, onSave }: HoursWorkedFormProps) {
+  const user = useAuthStore((s) => s.user);
   const [period, setPeriod]           = useState('2026-Q1');
   const [companyWide, setCompanyWide] = useState('');
   const [byDivision, setByDivision]   = useState<Partial<Record<Division, string>>>({});
@@ -42,11 +44,11 @@ export function HoursWorkedForm({ open, onClose, onSave }: HoursWorkedFormProps)
       }
     }
     onSave({
-      id:          `hw-${Date.now()}`,
+      id:          crypto.randomUUID(),
       period,
       companyWide: Number(companyWide),
       byDivision:  divParsed,
-      enteredBy:   'T. Griffith',
+      enteredBy:   user?.name ?? 'Unknown User',
       enteredAt:   new Date().toISOString(),
     });
     onClose();

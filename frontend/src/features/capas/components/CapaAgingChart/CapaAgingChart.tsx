@@ -56,10 +56,10 @@ export function CapaAgingChart() {
             />
             <Tooltip
               contentStyle={{
-                background: '#1a1a1a',
-                border: '1px solid #2a2a2a',
+                background: 'var(--color-surface, #1a1a1a)',
+                border: '1px solid var(--color-border, #2a2a2a)',
                 borderRadius: '6px',
-                color: '#f5f5f5',
+                color: 'var(--color-text-primary, #f5f5f5)',
                 fontSize: '0.875rem',
               }}
               cursor={{ fill: 'rgba(255,255,255,0.04)' }}

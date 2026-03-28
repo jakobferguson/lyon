@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuthStore } from '../../../stores/authStore';
 import type { DashboardFilters, HoursWorkedEntry } from '../types';
-import { DEFAULT_FILTERS, MONTHLY_INCIDENT_SEED, DIVISION_INCIDENT_SEED, SEVERITY_SEED, TRIR_BENCHMARK, HOURS_WORKED_SEED } from '../types';
+import { DEFAULT_FILTERS, MONTHLY_INCIDENT_SEED, DIVISION_INCIDENT_SEED, TRIR_BENCHMARK, HOURS_WORKED_SEED } from '../types';
 import {
   filterMonthly,
   computeKpiData,
@@ -9,6 +9,7 @@ import {
   getRecentIncidents,
   buildTrirTrendData,
   getAvgMonthlyHours,
+  computeSeverityData,
 } from '../utils';
 
 import { DashboardFiltersBar } from '../components/DashboardFilters/DashboardFilters';
@@ -28,16 +29,17 @@ export function DashboardRoute() {
   const { role } = useAuthStore();
   const [filters, setFilters]               = useState<DashboardFilters>(DEFAULT_FILTERS);
   const [hoursModalOpen, setHoursModalOpen] = useState(false);
-  const [, setHoursEntries]     = useState<HoursWorkedEntry[]>(HOURS_WORKED_SEED);
+  const [hoursEntries, setHoursEntries] = useState<HoursWorkedEntry[]>(HOURS_WORKED_SEED);
 
   const isSafetyManager = role === 'safety_manager' || role === 'admin';
 
   const filteredMonthly = useMemo(() => filterMonthly(MONTHLY_INCIDENT_SEED, filters), [filters]);
-  const kpiData         = useMemo(() => computeKpiData(filters), [filters]);
+  const kpiData         = useMemo(() => computeKpiData(filters, hoursEntries), [filters, hoursEntries]);
   const leadingData     = useMemo(() => computeLeadingIndicators(), []);
   const recentIncidents = useMemo(() => getRecentIncidents(filters), [filters]);
+  const severityData    = useMemo(() => computeSeverityData(filters), [filters]);
 
-  const avgMonthlyHours = useMemo(() => getAvgMonthlyHours(), []);
+  const avgMonthlyHours = useMemo(() => getAvgMonthlyHours(hoursEntries), [hoursEntries]);
   const trirTrendData   = useMemo(
     () => buildTrirTrendData(filteredMonthly, avgMonthlyHours, TRIR_BENCHMARK),
     [filteredMonthly, avgMonthlyHours],
@@ -74,7 +76,7 @@ export function DashboardRoute() {
           <IncidentTrendChart data={filteredMonthly} />
         </div>
         <div className={styles.chartNarrow}>
-          <SeverityDonut data={SEVERITY_SEED} />
+          <SeverityDonut data={severityData} />
         </div>
       </div>
 

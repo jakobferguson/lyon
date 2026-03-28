@@ -38,8 +38,8 @@ export function CapaDetailRoute() {
     );
   }
 
-  const currentUserId   = user?.id   ?? 'user-griffith';
-  const currentUserName = user?.name ?? 'T. Griffith';
+  const currentUserId   = user?.id   ?? '';
+  const currentUserName = user?.name ?? 'Unknown User';
   const isAssignee      = currentUserId === capa.assignedToId;
   const overdue         = isOverdue(capa);
 
@@ -73,11 +73,9 @@ export function CapaDetailRoute() {
   }
 
   function handleSaveNotes() {
+    setCapa((prev) => prev ? { ...prev, completionNotes } : prev);
     setSavingNotes(true);
-    setTimeout(() => {
-      setCapa((prev) => prev ? { ...prev, completionNotes } : prev);
-      setSavingNotes(false);
-    }, 400);
+    requestAnimationFrame(() => setSavingNotes(false));
   }
 
   return (

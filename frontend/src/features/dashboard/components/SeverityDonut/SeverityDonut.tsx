@@ -1,5 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { SeverityRecord } from '../../types';
+import { CHART_TOOLTIP_STYLE } from '../../types';
 import styles from './SeverityDonut.module.css';
 
 interface SeverityDonutProps {
@@ -30,12 +31,7 @@ export function SeverityDonut({ data }: SeverityDonutProps) {
             ))}
           </Pie>
           <Tooltip
-            contentStyle={{
-              background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
-              borderRadius: '6px',
-              fontSize: '0.8125rem',
-            }}
+            contentStyle={CHART_TOOLTIP_STYLE}
             formatter={(value, name) => [
               `${value} (${Math.round((Number(value) / total) * 100)}%)`,
               name,
