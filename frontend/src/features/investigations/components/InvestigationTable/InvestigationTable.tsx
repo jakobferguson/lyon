@@ -15,6 +15,12 @@ const ESCALATION_LABELS: Record<string, string> = {
   tier3: '🚨 Overdue +14d',
 };
 
+const TIER_CLASS: Record<string, string | undefined> = {
+  tier1: styles.tier1,
+  tier2: styles.tier2,
+  tier3: styles.tier3,
+};
+
 export function InvestigationTable() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('');
@@ -108,7 +114,7 @@ export function InvestigationTable() {
                     </td>
                     <td>
                       {tier !== 'none' && (
-                        <span className={`${styles.escalationPill} ${styles[tier]}`}>
+                        <span className={`${styles.escalationPill} ${TIER_CLASS[tier] ?? ''}`}>
                           {ESCALATION_LABELS[tier]}
                         </span>
                       )}

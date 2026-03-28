@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Modal } from '../../../../components/ui';
 import type { InvestigationStatus, WitnessStatement } from '../../types';
 import { formatDateOnly, formatDateShort } from '../../utils';
+import { useAuthStore } from '../../../../stores/authStore';
 import styles from './WitnessStatementForm.module.css';
 
 interface WitnessStatementFormProps {
@@ -66,6 +67,8 @@ function StatementCard({ statement, index }: { statement: WitnessStatement; inde
 
 export function WitnessStatementForm({ statements: initialStatements, status }: WitnessStatementFormProps) {
   const readonly = status === 'Approved';
+  const user = useAuthStore((s) => s.user);
+  const userName = user?.name ?? 'Unknown User';
   const [statements, setStatements] = useState<WitnessStatement[]>(initialStatements);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState<NewStatementFormValues>(EMPTY_FORM);
@@ -84,14 +87,14 @@ export function WitnessStatementForm({ statements: initialStatements, status }: 
     if (!validate()) return;
 
     const newStatement: WitnessStatement = {
-      id: `ws-${Date.now()}`,
+      id: crypto.randomUUID(),
       witnessName: form.witnessName.trim(),
       jobTitle: form.jobTitle.trim(),
       employer: form.employer.trim(),
       phone: form.phone.trim(),
       statementText: form.statementText.trim(),
       collectionDate: form.collectionDate,
-      collectedBy: 'Current User',
+      collectedBy: userName,
       submittedAt: new Date().toISOString(),
     };
 

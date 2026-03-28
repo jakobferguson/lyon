@@ -3,6 +3,7 @@ import { Button, Modal, Badge } from '../../../../components/ui';
 import type { Investigation, InvestigationReview, InvestigationStatus } from '../../types';
 import { formatDateShort } from '../../utils';
 import { usePermission } from '../../../../hooks/usePermission';
+import { useAuthStore } from '../../../../stores/authStore';
 import styles from './ReviewPanel.module.css';
 
 interface ReviewPanelProps {
@@ -31,6 +32,8 @@ function ReviewHistoryItem({ review }: { review: InvestigationReview }) {
 
 export function ReviewPanel({ investigation }: ReviewPanelProps) {
   const canReview = usePermission('safety_manager');
+  const user = useAuthStore((s) => s.user);
+  const userName = user?.name ?? 'Unknown User';
   const [reviews, setReviews] = useState<InvestigationReview[]>(investigation.reviews);
   const [status, setStatus] = useState<InvestigationStatus>(investigation.status);
 
@@ -44,9 +47,9 @@ export function ReviewPanel({ investigation }: ReviewPanelProps) {
 
   function submitApproval() {
     const newReview: InvestigationReview = {
-      id: `rev-${Date.now()}`,
+      id: crypto.randomUUID(),
       action: 'Approved',
-      reviewedBy: 'Current User (Safety Manager)',
+      reviewedBy: userName,
       reviewedAt: new Date().toISOString(),
       comments: '',
     };
@@ -61,9 +64,9 @@ export function ReviewPanel({ investigation }: ReviewPanelProps) {
       return;
     }
     const newReview: InvestigationReview = {
-      id: `rev-${Date.now()}`,
+      id: crypto.randomUUID(),
       action: 'Returned',
-      reviewedBy: 'Current User (Safety Manager)',
+      reviewedBy: userName,
       reviewedAt: new Date().toISOString(),
       comments: returnComment.trim(),
     };
