@@ -13,18 +13,5 @@ export const STATUS_VARIANT: Record<IncidentStatus, BadgeVariant> = {
   'Reopened':               'overdue',
 };
 
-/** Short format for table rows: "Mar 10, 2026, 8:30 AM" */
-export function formatDateShort(dt: string): string {
-  return new Date(dt).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit',
-  });
-}
-
-/** Long format for detail headers: "Monday, March 10, 2026 at 8:30 AM CDT" */
-export function formatDateLong(dt: string): string {
-  return new Date(dt).toLocaleString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
-  });
-}
+// Date formatting (re-exported from shared utils)
+export { formatDateShort, formatDateLong } from '../../utils/dates';

@@ -101,17 +101,6 @@ export function computeKpis(capas: Capa[]) {
   return { open, overdue, effectivenessRate, avgCloseDays };
 }
 
-// ── Date formatting ───────────────────────────────────────────────────────
+// ── Date formatting (re-exported from shared utils) ──────────────────────
 
-export function formatDateShort(dt: string): string {
-  return new Date(dt).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit',
-  });
-}
-
-export function formatDateOnly(dt: string): string {
-  return new Date(dt).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-  });
-}
+export { formatDateShort, formatDateOnly } from '../../utils/dates';

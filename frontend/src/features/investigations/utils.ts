@@ -65,24 +65,6 @@ export function getDaysOverdue(targetDate: string): number {
   return Math.floor((now - target) / (24 * 60 * 60 * 1000));
 }
 
-// ── Date formatting ───────────────────────────────────────────────────────
+// ── Date formatting (re-exported from shared utils) ──────────────────────
 
-export function formatDateShort(dt: string): string {
-  return new Date(dt).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit',
-  });
-}
-
-export function formatDateOnly(dt: string): string {
-  return new Date(dt).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-  });
-}
-
-export function formatDateLong(dt: string): string {
-  return new Date(dt).toLocaleString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
-  });
-}
+export { formatDateShort, formatDateOnly, formatDateLong } from '../../utils/dates';

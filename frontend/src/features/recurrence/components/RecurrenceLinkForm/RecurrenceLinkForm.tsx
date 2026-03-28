@@ -3,6 +3,7 @@ import { Button, FormField } from '../../../../components/ui';
 import { INCIDENT_SEED } from '../../../incidents/types';
 import type { RecurrenceLink, SimilarityType } from '../../types';
 import { SIMILARITY_TYPES } from '../../types';
+import { useAuthStore } from '../../../../stores/authStore';
 import styles from './RecurrenceLinkForm.module.css';
 
 interface RecurrenceLinkFormProps {
@@ -12,6 +13,7 @@ interface RecurrenceLinkFormProps {
 }
 
 export function RecurrenceLinkForm({ currentIncidentId, existingLinks, onLink }: RecurrenceLinkFormProps) {
+  const user = useAuthStore((s) => s.user);
   const [open, setOpen]               = useState(false);
   const [targetId, setTargetId]       = useState('');
   const [selected, setSelected]       = useState<SimilarityType[]>([]);
@@ -38,12 +40,12 @@ export function RecurrenceLinkForm({ currentIncidentId, existingLinks, onLink }:
     if (!validate()) return;
 
     const link: RecurrenceLink = {
-      id: `rec-${Date.now()}`,
+      id: crypto.randomUUID(),
       incidentAId: currentIncidentId,
       incidentBId: targetId,
       similarityTypes: selected,
       notes,
-      linkedBy: 'T. Griffith',
+      linkedBy: user?.name ?? 'Unknown User',
       linkedAt: new Date().toISOString(),
     };
     onLink(link);
