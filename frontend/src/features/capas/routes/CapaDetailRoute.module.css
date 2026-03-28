@@ -1,0 +1,150 @@
+.page { display: flex; flex-direction: column; gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+
+/* Header */
+.header { display: flex; flex-direction: column; gap: 0.75rem; }
+.breadcrumb { }
+.back {
+  font-size: 0.875rem;
+  color: var(--color-accent, #c8a45a);
+  text-decoration: none;
+}
+.back:hover { text-decoration: underline; }
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.capaNum {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0;
+}
+
+.type {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #888);
+  margin: 0.25rem 0 0;
+}
+
+.badges { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+/* Overdue banner */
+.overdueBanner {
+  background: rgba(220,38,38,0.1);
+  border: 1px solid var(--color-danger, #dc2626);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-danger, #dc2626);
+  font-weight: 500;
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.main  { display: flex; flex-direction: column; gap: 1.25rem; }
+.side  { display: flex; flex-direction: column; gap: 1.25rem; }
+
+/* Card */
+.card {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cardTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+.body {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #aaa);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.muted { color: var(--color-text-muted, #888); font-size: 0.875rem; font-style: italic; }
+
+/* Details */
+.dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.dl dt {
+  color: var(--color-text-muted, #888);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dl dd {
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0;
+}
+
+.overdueText { color: var(--color-danger, #dc2626); font-weight: 600; }
+
+/* Links */
+.linkList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.incLink {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.incLink:hover { background: var(--color-surface-elevated, #222); }
+
+.incNum { font-size: 0.875rem; font-weight: 600; color: var(--color-accent, #c8a45a); }
+.incDesc { font-size: 0.8rem; color: var(--color-text-muted, #888); }
+
+.invLink {
+  font-size: 0.875rem;
+  color: var(--color-accent, #c8a45a);
+  text-decoration: none;
+}
+
+.invLink:hover { text-decoration: underline; }
+
+/* Completion notes */
+.notesAction { display: flex; justify-content: flex-end; }
+
+/* Not found */
+.notFound {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}

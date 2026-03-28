@@ -1,112 +1,168 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../stores/authStore';
-import { Button } from '../../../components/ui';
 import type { Role, Division } from '../../../types';
 import styles from './DevLoginRoute.module.css';
 
-const ROLES: { value: Role; label: string }[] = [
-  { value: 'field_reporter',      label: 'Field Reporter' },
-  { value: 'safety_coordinator',  label: 'Safety Coordinator' },
-  { value: 'safety_manager',      label: 'Safety Manager' },
-  { value: 'project_manager',     label: 'Project Manager' },
-  { value: 'division_manager',    label: 'Division Manager' },
-  { value: 'executive',           label: 'Executive' },
-  { value: 'admin',               label: 'Admin' },
+// Each "account" maps to a role + display identity
+const ACCOUNTS: {
+  role: Role;
+  name: string;
+  email: string;
+  division: Division | '';
+  initials: string;
+  color: string;
+}[] = [
+  { role: 'field_reporter',     name: 'Alex Rivera',       email: 'a.rivera@herzog.com',      division: 'HCC',   initials: 'AR', color: '#0078d4' },
+  { role: 'safety_coordinator', name: 'Maria Santos',      email: 'm.santos@herzog.com',      division: 'HCC',   initials: 'MS', color: '#107c41' },
+  { role: 'safety_manager',     name: 'Trevor Griffith',   email: 't.griffith@herzog.com',    division: '',      initials: 'TG', color: '#8764b8' },
+  { role: 'project_manager',    name: 'James Okafor',      email: 'j.okafor@herzog.com',      division: 'HRSI',  initials: 'JO', color: '#d83b01' },
+  { role: 'division_manager',   name: 'Lin Chen',          email: 'l.chen@herzog.com',        division: 'HTI',   initials: 'LC', color: '#038387' },
+  { role: 'executive',          name: 'Sandra Kowalski',   email: 's.kowalski@herzog.com',    division: '',      initials: 'SK', color: '#ca5010' },
+  { role: 'admin',              name: 'Dev Admin',         email: 'admin@herzog.com',         division: '',      initials: 'DA', color: '#57606a' },
 ];
 
-const DIVISIONS: { value: Division | ''; label: string }[] = [
-  { value: '',              label: 'No Division (Company-Wide)' },
-  { value: 'HCC',           label: 'HCC — Herzog Contracting Corp.' },
-  { value: 'HRSI',          label: 'HRSI — Herzog Railway Services, Inc.' },
-  { value: 'HSI',           label: 'HSI — Herzog Services, Inc.' },
-  { value: 'HTI',           label: 'HTI — Herzog Transit Inc.' },
-  { value: 'HTSI',          label: 'HTSI — Herzog Technology Solutions' },
-  { value: 'Herzog Energy', label: 'Herzog Energy' },
-  { value: 'Green Group',   label: 'Green Group' },
-];
+const ROLE_LABELS: Record<Role, string> = {
+  field_reporter:     'Field Reporter',
+  safety_coordinator: 'Safety Coordinator',
+  safety_manager:     'Safety Manager',
+  project_manager:    'Project Manager',
+  division_manager:   'Division Manager',
+  executive:          'Executive',
+  admin:              'Administrator',
+};
 
 export function DevLoginRoute() {
   const navigate = useNavigate();
   const setUser = useAuthStore((s) => s.setUser);
 
-  const [role, setRole] = useState<Role>('admin');
-  const [division, setDivision] = useState<Division | ''>('');
-  const [name, setName] = useState('Dev User');
+  const [step, setStep] = useState<'pick' | 'password'>('pick');
+  const [selectedIndex, setSelectedIndex] = useState(2); // Safety Manager default
+  const [password, setPassword] = useState('');
 
-  function handleSubmit(e: FormEvent) {
+  const account = ACCOUNTS[selectedIndex];
+
+  function handlePickNext(e: FormEvent) {
+    e.preventDefault();
+    setStep('password');
+  }
+
+  function handleSignIn(e: FormEvent) {
     e.preventDefault();
     setUser(
-      { id: 'dev-user-001', name, email: 'dev@herzog.com' },
-      role,
-      division === '' ? null : division,
+      { id: `dev-${account.role}`, name: account.name, email: account.email },
+      account.role,
+      account.division === '' ? null : account.division,
     );
     navigate('/app/dashboard');
+  }
+
+  function handleBack() {
+    setStep('pick');
+    setPassword('');
   }
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <div className={styles.logoBar}>
-          <span className={styles.logoName}>Herzog</span>
-          <span className={styles.logoDivider} aria-hidden="true" />
-          <span className={styles.logoApp}>Lyon · Dev Login</span>
+        {/* Microsoft logo */}
+        <div className={styles.msLogo} aria-label="Microsoft">
+          <svg width="21" height="21" viewBox="0 0 21 21" aria-hidden="true">
+            <rect x="0" y="0" width="10" height="10" fill="#f25022" />
+            <rect x="11" y="0" width="10" height="10" fill="#7fba00" />
+            <rect x="0" y="11" width="10" height="10" fill="#00a4ef" />
+            <rect x="11" y="11" width="10" height="10" fill="#ffb900" />
+          </svg>
         </div>
 
-        <p className={styles.notice}>
-          Development mode — Azure AD bypassed. Pick a role to sign in.
-        </p>
+        {step === 'pick' ? (
+          <form onSubmit={handlePickNext} noValidate>
+            <h1 className={styles.heading}>Sign in</h1>
+            <p className={styles.subheading}>to continue to <strong>Lyon</strong> — Herzog Safety Platform</p>
 
-        <form onSubmit={handleSubmit} className={styles.form} noValidate>
-          <label className={styles.label} htmlFor="dev-name">
-            Display Name
-          </label>
-          <input
-            id="dev-name"
-            className={styles.input}
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+            <div className={styles.accountList}>
+              {ACCOUNTS.map((acct, i) => (
+                <label
+                  key={acct.role}
+                  className={`${styles.accountRow} ${selectedIndex === i ? styles.accountRowSelected : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="account"
+                    className={styles.radioHidden}
+                    checked={selectedIndex === i}
+                    onChange={() => setSelectedIndex(i)}
+                  />
+                  <span
+                    className={styles.avatar}
+                    style={{ background: acct.color }}
+                    aria-hidden="true"
+                  >
+                    {acct.initials}
+                  </span>
+                  <span className={styles.accountInfo}>
+                    <span className={styles.accountName}>{acct.name}</span>
+                    <span className={styles.accountEmail}>{acct.email}</span>
+                  </span>
+                  <span className={styles.accountRole}>{ROLE_LABELS[acct.role]}</span>
+                </label>
+              ))}
+            </div>
 
-          <label className={styles.label} htmlFor="dev-role">
-            Role
-          </label>
-          <select
-            id="dev-role"
-            className={styles.select}
-            value={role}
-            onChange={(e) => setRole(e.target.value as Role)}
-          >
-            {ROLES.map((r) => (
-              <option key={r.value} value={r.value}>
-                {r.label}
-              </option>
-            ))}
-          </select>
+            <button type="submit" className={styles.nextBtn}>Next</button>
 
-          <label className={styles.label} htmlFor="dev-division">
-            Division
-          </label>
-          <select
-            id="dev-division"
-            className={styles.select}
-            value={division}
-            onChange={(e) => setDivision(e.target.value as Division | '')}
-          >
-            {DIVISIONS.map((d) => (
-              <option key={d.value} value={d.value}>
-                {d.label}
-              </option>
-            ))}
-          </select>
+            <div className={styles.devBadge}>DEV ENVIRONMENT — Azure AD bypassed</div>
+          </form>
+        ) : (
+          <form onSubmit={handleSignIn} noValidate>
+            {/* Signed-in-as header */}
+            <div className={styles.selectedAccount}>
+              <span
+                className={styles.avatarSm}
+                style={{ background: account.color }}
+                aria-hidden="true"
+              >
+                {account.initials}
+              </span>
+              <div className={styles.selectedAccountText}>
+                <span className={styles.accountName}>{account.name}</span>
+                <button type="button" className={styles.switchLink} onClick={handleBack}>
+                  ← Use a different account
+                </button>
+              </div>
+            </div>
 
-          <Button type="submit" variant="accent" size="lg" className={styles.submitBtn}>
-            Sign In
-          </Button>
-        </form>
+            <h1 className={styles.heading}>Enter password</h1>
+            <p className={styles.subheading}>{account.email}</p>
+
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="ms-password">Password</label>
+              <input
+                id="ms-password"
+                type="password"
+                className={styles.msInput}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoFocus
+                autoComplete="current-password"
+              />
+            </div>
+
+            <a href="#" className={styles.forgotLink} onClick={(e) => e.preventDefault()}>
+              Forgot my password
+            </a>
+
+            <button type="submit" className={styles.nextBtn}>Sign in</button>
+
+            <div className={styles.devBadge}>DEV ENVIRONMENT — Azure AD bypassed</div>
+          </form>
+        )}
       </div>
+
+      <p className={styles.footer}>
+        © {new Date().getFullYear()} Herzog — Internal Use Only
+      </p>
     </div>
   );
 }

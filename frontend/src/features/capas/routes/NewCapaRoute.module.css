@@ -1,0 +1,24 @@
+.page { display: flex; flex-direction: column; gap: 1.5rem; max-width: 880px; margin: 0 auto; }
+
+.header { display: flex; flex-direction: column; gap: 0.375rem; }
+
+.back {
+  font-size: 0.875rem;
+  color: var(--color-accent, #c8a45a);
+  text-decoration: none;
+  align-self: flex-start;
+}
+.back:hover { text-decoration: underline; }
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}

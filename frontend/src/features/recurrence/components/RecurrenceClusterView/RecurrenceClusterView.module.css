@@ -1,0 +1,67 @@
+.cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  background: var(--color-surface-elevated, #222);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-left: 4px solid var(--color-accent, #c8a45a);
+  border-radius: 6px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.incLink { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+.incLink:hover .incNum { text-decoration: underline; }
+
+.incNum {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-accent, #c8a45a);
+}
+
+.incType {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #888);
+}
+
+.division {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #888);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.types { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+
+.notes {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #aaa);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #888);
+}
+
+.empty {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #888);
+  font-style: italic;
+  margin: 0;
+}

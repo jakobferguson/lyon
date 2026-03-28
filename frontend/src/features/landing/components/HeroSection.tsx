@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+import { msalInstance } from '../../../lib/msal';
 import styles from './HeroSection.module.css';
+
+const DEV_AUTH = import.meta.env.VITE_DEV_AUTH === 'true';
 
 const STATS = [
   { value: '7', label: 'Divisions' },
@@ -8,6 +12,16 @@ const STATS = [
 ] as const;
 
 export function HeroSection() {
+  const navigate = useNavigate();
+
+  function handleSignIn() {
+    if (DEV_AUTH) {
+      navigate('/dev-login');
+    } else {
+      msalInstance.loginRedirect();
+    }
+  }
+
   return (
     <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.inner}>
@@ -24,9 +38,9 @@ export function HeroSection() {
           </p>
 
           <div className={styles.actions}>
-            <a href="#sign-in" className={styles.btnPrimary} id="sign-in">
+            <button onClick={handleSignIn} className={styles.btnPrimary}>
               Sign In to Lyon
-            </a>
+            </button>
             <a href="#features" className={styles.btnSecondary}>
               Learn More
             </a>

@@ -1,0 +1,59 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.formTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+.typesField { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.typesLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #aaa);
+}
+
+.required { color: var(--color-danger, #dc2626); }
+
+.error { font-size: 0.8125rem; color: var(--color-danger, #dc2626); }
+
+.typesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.typeOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-text-secondary, #aaa);
+  transition: background 0.15s;
+}
+
+.typeOption:hover { background: var(--color-surface-elevated, #222); }
+
+.typeChecked {
+  border-color: var(--color-accent, #c8a45a);
+  background: rgba(200,164,90,0.08);
+  color: var(--color-accent, #c8a45a);
+}
+
+.actions { display: flex; justify-content: flex-end; gap: 0.75rem; }

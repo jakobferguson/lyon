@@ -1,0 +1,57 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--color-surface, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-left: 4px solid var(--color-border, #2a2a2a);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card.danger {
+  border-left-color: var(--color-danger, #dc2626);
+}
+
+.card.success {
+  border-left-color: var(--color-success, #22c55e);
+}
+
+.card.default {
+  border-left-color: var(--color-accent, #c8a45a);
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #f5f5f5);
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #888);
+  margin-top: 0.25rem;
+}
+
+.sub {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #888);
+}
