@@ -145,3 +145,24 @@ export const SEVERITY_SEED: SeverityRecord[] = [
 // ── TRIR benchmark ────────────────────────────────────────────────────────
 
 export const TRIR_BENCHMARK = 2.5; // industry average for rail construction
+
+// ── Shared chart constants ───────────────────────────────────────────────
+
+export const INCIDENT_TYPE_COLORS: Record<string, string> = {
+  Injury:           '#dc2626',
+  'Near Miss':      '#c8a45a',
+  'Property Damage':'#3b82f6',
+  Environmental:    '#22c55e',
+  Vehicle:          '#a855f7',
+  Fire:             '#f97316',
+  'Utility Strike': '#06b6d4',
+};
+
+export const INCIDENT_TYPES = ['Injury', 'Near Miss', 'Property Damage', 'Environmental', 'Vehicle', 'Fire', 'Utility Strike'] as const;
+
+export const CHART_TOOLTIP_STYLE: React.CSSProperties = {
+  background: 'var(--color-surface, #1a1a1a)',
+  border: '1px solid var(--color-border, #2a2a2a)',
+  borderRadius: '6px',
+  fontSize: '0.8125rem',
+};

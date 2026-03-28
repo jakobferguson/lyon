@@ -3,7 +3,7 @@ import {
   Legend, ReferenceLine, ResponsiveContainer,
 } from 'recharts';
 import type { TrirDataPoint } from '../../utils';
-import { TRIR_BENCHMARK } from '../../types';
+import { TRIR_BENCHMARK, CHART_TOOLTIP_STYLE } from '../../types';
 import styles from './TrirTrendChart.module.css';
 
 interface TrirTrendChartProps {
@@ -40,12 +40,7 @@ export function TrirTrendChart({ data, benchmark = TRIR_BENCHMARK }: TrirTrendCh
             domain={[0, 'auto']}
           />
           <Tooltip
-            contentStyle={{
-              background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
-              borderRadius: '6px',
-              fontSize: '0.8125rem',
-            }}
+            contentStyle={CHART_TOOLTIP_STYLE}
             cursor={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
           <Legend

@@ -3,19 +3,8 @@ import {
   Legend, ResponsiveContainer,
 } from 'recharts';
 import type { DivisionIncidentRecord } from '../../types';
+import { INCIDENT_TYPE_COLORS, INCIDENT_TYPES, CHART_TOOLTIP_STYLE } from '../../types';
 import styles from './DivisionChart.module.css';
-
-const COLORS: Record<string, string> = {
-  Injury:           '#dc2626',
-  'Near Miss':      '#c8a45a',
-  'Property Damage':'#3b82f6',
-  Environmental:    '#22c55e',
-  Vehicle:          '#a855f7',
-  Fire:             '#f97316',
-  'Utility Strike': '#06b6d4',
-};
-
-const TYPES = ['Injury', 'Near Miss', 'Property Damage', 'Environmental', 'Vehicle', 'Fire', 'Utility Strike'] as const;
 
 interface DivisionChartProps {
   data: DivisionIncidentRecord[];
@@ -49,12 +38,7 @@ export function DivisionChart({ data }: DivisionChartProps) {
             allowDecimals={false}
           />
           <Tooltip
-            contentStyle={{
-              background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
-              borderRadius: '6px',
-              fontSize: '0.8125rem',
-            }}
+            contentStyle={CHART_TOOLTIP_STYLE}
             cursor={{ fill: 'rgba(255,255,255,0.04)' }}
           />
           <Legend
@@ -62,12 +46,12 @@ export function DivisionChart({ data }: DivisionChartProps) {
             iconSize={8}
             iconType="square"
           />
-          {TYPES.map((type) => (
+          {INCIDENT_TYPES.map((type) => (
             <Bar
               key={type}
               dataKey={type}
               name={type}
-              fill={COLORS[type]}
+              fill={INCIDENT_TYPE_COLORS[type]}
               radius={[2, 2, 0, 0]}
             />
           ))}
