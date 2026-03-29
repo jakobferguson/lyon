@@ -1,7 +1,0 @@
-{
-  "Lyon.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Projects\\lyon\\src\\Lyon.Api",
-  "Lyon.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Projects\\lyon\\src\\Lyon.Application",
-  "Lyon.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Projects\\lyon\\src\\Lyon.Contracts",
-  "Lyon.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Projects\\lyon\\src\\Lyon.Domain",
-  "Lyon.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Projects\\lyon\\src\\Lyon.Infrastructure"
-}
