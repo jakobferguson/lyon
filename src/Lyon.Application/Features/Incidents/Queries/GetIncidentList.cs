@@ -80,7 +80,7 @@ public class GetIncidentListQueryHandler : IRequestHandler<GetIncidentListQuery,
                 Severity = i.Severity != null ? i.Severity.ToString() : null,
                 Status = i.Status.ToString(),
                 Description = i.Description,
-                ReportedBy = i.ReportedBy.DisplayName,
+                ReportedBy = i.ReportedBy != null ? i.ReportedBy.DisplayName : "Unknown",
                 Location = new LocationResponse
                 {
                     Latitude = i.LocationLatitude,

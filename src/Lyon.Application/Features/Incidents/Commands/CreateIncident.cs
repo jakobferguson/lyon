@@ -17,7 +17,9 @@ public class CreateIncidentCommandValidator : AbstractValidator<CreateIncidentCo
 {
     public CreateIncidentCommandValidator()
     {
-        RuleFor(x => x.Request.IncidentType).NotEmpty();
+        RuleFor(x => x.Request.IncidentType).NotEmpty()
+            .Must(v => Enum.TryParse<IncidentType>(v?.Replace(" ", ""), ignoreCase: true, out _))
+            .WithMessage("Invalid incident type.");
         RuleFor(x => x.Request.DateTime).NotEmpty();
         RuleFor(x => x.Request.Description).NotEmpty().MaximumLength(5000);
         RuleFor(x => x.Request.LocationDescription).NotEmpty().MaximumLength(500);
@@ -46,11 +48,14 @@ public class CreateIncidentCommandHandler : IRequestHandler<CreateIncidentComman
 
         var incidentNumber = await GenerateIncidentNumberAsync(cancellationToken);
 
+        if (!Enum.TryParse<IncidentType>(req.IncidentType.Replace(" ", ""), ignoreCase: true, out var parsedType))
+            throw new Lyon.Domain.Exceptions.DomainException($"Invalid incident type: {req.IncidentType}");
+
         var incident = new Incident
         {
             Id = Guid.NewGuid(),
             IncidentNumber = incidentNumber,
-            IncidentType = Enum.Parse<IncidentType>(req.IncidentType.Replace(" ", ""), ignoreCase: true),
+            IncidentType = parsedType,
             DateTime = req.DateTime,
             TimezoneId = req.TimezoneId ?? "America/Chicago",
             Description = req.Description,
@@ -159,9 +164,17 @@ public class CreateIncidentCommandHandler : IRequestHandler<CreateIncidentComman
     private async Task<string> GenerateIncidentNumberAsync(CancellationToken cancellationToken)
     {
         var year = _dateTime.UtcNow.Year;
-        var count = await _db.Incidents
-            .CountAsync(i => i.CreatedAt.Year == year, cancellationToken);
-        return $"INC-{year}-{(count + 1):D3}";
+        var yearStart = new DateTimeOffset(year, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var yearEnd = yearStart.AddYears(1);
+
+        // Use max incident number for the year to avoid race conditions.
+        // The unique index on IncidentNumber provides a safety net for concurrent inserts.
+        var maxNumber = await _db.Incidents
+            .IgnoreQueryFilters()
+            .Where(i => i.CreatedAt >= yearStart && i.CreatedAt < yearEnd)
+            .CountAsync(cancellationToken);
+
+        return $"INC-{year}-{(maxNumber + 1):D3}";
     }
 
     private async Task<IncidentDetailResponse> MapToDetailResponse(Incident incident, CancellationToken cancellationToken)

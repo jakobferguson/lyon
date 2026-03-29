@@ -27,12 +27,12 @@ public class AddContributingFactorCommandHandler : IRequestHandler<AddContributi
         _ = await _db.Investigations.FirstOrDefaultAsync(i => i.Id == cmd.InvestigationId && !i.IsDeleted, ct)
             ?? throw new KeyNotFoundException($"Investigation {cmd.InvestigationId} not found.");
 
+        // Clear any existing primary flag atomically to avoid race conditions
         if (cmd.IsPrimary)
         {
-            var existingPrimary = await _db.ContributingFactors
+            await _db.ContributingFactors
                 .Where(f => f.InvestigationId == cmd.InvestigationId && f.IsPrimary)
-                .ToListAsync(ct);
-            foreach (var f in existingPrimary) f.IsPrimary = false;
+                .ExecuteUpdateAsync(s => s.SetProperty(f => f.IsPrimary, false), ct);
         }
 
         var factor = new ContributingFactor

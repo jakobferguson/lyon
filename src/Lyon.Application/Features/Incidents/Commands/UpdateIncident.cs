@@ -43,6 +43,12 @@ public class UpdateIncidentCommandHandler : IRequestHandler<UpdateIncidentComman
             .FirstOrDefaultAsync(i => i.Id == command.IncidentId && !i.IsDeleted, cancellationToken)
             ?? throw new KeyNotFoundException($"Incident {command.IncidentId} not found.");
 
+        // Only the reporter can edit, unless user has SafetyCoordinator+ role
+        var isOwner = incident.ReportedById == _currentUser.UserId;
+        var hasElevatedRole = _currentUser.HasMinimumRole(UserRole.SafetyCoordinator);
+        if (!isOwner && !hasElevatedRole)
+            throw new UnauthorizedAccessException("You can only edit incidents you reported.");
+
         var req = command.Request;
 
         if (req.Description is not null) incident.Description = req.Description;
@@ -113,7 +119,7 @@ public class UpdateIncidentCommandHandler : IRequestHandler<UpdateIncidentComman
             IsDart = incident.IsDart,
             OshaOverrideJustification = incident.OshaOverrideJustification,
             ReopenCount = incident.ReopenCount,
-            ReportedBy = incident.ReportedBy.DisplayName,
+            ReportedBy = incident.ReportedBy?.DisplayName ?? "Unknown",
             ReportedById = incident.ReportedById,
             CreatedAt = incident.CreatedAt,
             UpdatedAt = incident.UpdatedAt,

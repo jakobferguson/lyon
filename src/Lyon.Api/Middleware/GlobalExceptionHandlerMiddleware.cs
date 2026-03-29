@@ -30,14 +30,16 @@ public class GlobalExceptionHandlerMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        // Validation and domain exceptions have user-facing messages.
+        // All other exceptions get generic messages to prevent information leakage.
         var (statusCode, title, detail) = exception switch
         {
             ValidationException ve => (StatusCodes.Status400BadRequest, "Validation Failed",
                 string.Join("; ", ve.Errors.Select(e => e.ErrorMessage))),
-            KeyNotFoundException knf => (StatusCodes.Status404NotFound, "Not Found", knf.Message),
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "Not Found", "The requested resource was not found."),
             InvalidStatusTransitionException ist => (StatusCodes.Status422UnprocessableEntity, "Invalid Status Transition", ist.Message),
             DomainException de => (StatusCodes.Status422UnprocessableEntity, "Domain Error", de.Message),
-            InvalidOperationException ioe => (StatusCodes.Status409Conflict, "Conflict", ioe.Message),
+            InvalidOperationException => (StatusCodes.Status409Conflict, "Conflict", "A conflict occurred while processing your request."),
             UnauthorizedAccessException => (StatusCodes.Status403Forbidden, "Forbidden", "You do not have permission to perform this action."),
             _ => (StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred.")
         };

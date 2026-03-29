@@ -48,6 +48,7 @@ export interface IncidentDetail extends IncidentListItem {
   isDart: boolean | null;
   oshaOverrideJustification: string | null;
   reopenCount: number;
+  completionPercentage: number;
   reportedById: string;
   createdAt: string;
   updatedAt: string;

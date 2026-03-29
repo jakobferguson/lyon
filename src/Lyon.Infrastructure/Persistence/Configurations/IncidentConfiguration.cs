@@ -34,6 +34,7 @@ public class IncidentConfiguration : IEntityTypeConfiguration<Incident>
         builder.HasIndex(e => e.ReportedById);
         builder.HasIndex(e => e.DateTime);
         builder.HasIndex(e => e.IncidentType);
+        builder.HasIndex(e => e.CreatedAt);
 
         builder.HasQueryFilter(e => !e.IsDeleted);
         builder.Ignore(e => e.DomainEvents);
