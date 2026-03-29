@@ -213,8 +213,11 @@ export function useCreateIncident() {
 export function useUpdateIncident() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, form }: { id: string; form: Partial<IncidentFormValues> }) => {
-      const { data } = await apiClient.put<IncidentDetail>(`/incidents/${id}`, form);
+    mutationFn: async ({ id, form, submitAsReported = false }: { id: string; form: IncidentFormValues; submitAsReported?: boolean }) => {
+      const { data } = await apiClient.put<IncidentDetail>(
+        `/incidents/${id}`,
+        mapFormToRequest(form, submitAsReported),
+      );
       return data;
     },
     onSuccess: (data) => {

@@ -6,8 +6,8 @@ import { apiClient } from '../../../lib/api-client';
 import { STATUS_VARIANT, formatDateLong } from '../utils';
 import { useInvestigationByIncident } from '../../investigations/api/investigations';
 import { INVESTIGATION_STATUS_VARIANT, formatDateOnly, getEscalationTier } from '../../investigations/utils';
-import { CAPA_SEED } from '../../capas/types';
-import { CAPA_STATUS_VARIANT, PRIORITY_VARIANT, isOverdue } from '../../capas/utils';
+import { useCapaList } from '../../capas/api/capas';
+import { CAPA_STATUS_VARIANT, PRIORITY_VARIANT } from '../../capas/utils';
 import { RECURRENCE_SEED } from '../../recurrence/types';
 import { RecurrenceLinkForm } from '../../recurrence/components/RecurrenceLinkForm/RecurrenceLinkForm';
 import { RecurrenceClusterView } from '../../recurrence/components/RecurrenceClusterView/RecurrenceClusterView';
@@ -133,7 +133,15 @@ function InvestigationSummaryTab({ incidentId }: { incidentId: string }) {
 
 function CapasTab({ incidentId }: { incidentId: string }) {
   const navigate = useNavigate();
-  const linkedCapas = CAPA_SEED.filter((c) => c.linkedIncidentIds.includes(incidentId));
+  const { data, isLoading } = useCapaList({ incidentId, pageSize: 50 });
+  const linkedCapas = data?.items ?? [];
+
+  const CLOSED_STATUSES = ['Verified Effective', 'Verified Ineffective'];
+
+  if (isLoading) {
+    return <div className={styles.comingSoon}><Spinner size="md" /></div>;
+  }
+
   return (
     <div className={styles.capasTab}>
       <div className={styles.capaTabHeader}>
@@ -148,14 +156,14 @@ function CapasTab({ incidentId }: { incidentId: string }) {
       ) : (
         <div className={styles.capaList}>
           {linkedCapas.map((capa) => {
-            const overdue = isOverdue(capa);
+            const overdue = !CLOSED_STATUSES.includes(capa.status) && Date.now() > new Date(capa.dueDate).getTime();
             return (
               <Link key={capa.id} to={`/app/capas/${capa.id}`} className={styles.capaCard}>
                 <div className={styles.capaCardHeader}>
                   <span className={styles.capaNum}>{capa.capaNumber}</span>
                   <div className={styles.capaBadges}>
-                    <Badge variant={PRIORITY_VARIANT[capa.priority]}>{capa.priority}</Badge>
-                    <Badge variant={CAPA_STATUS_VARIANT[capa.status]}>{capa.status}</Badge>
+                    <Badge variant={PRIORITY_VARIANT[capa.priority as keyof typeof PRIORITY_VARIANT] ?? 'neutral'}>{capa.priority}</Badge>
+                    <Badge variant={CAPA_STATUS_VARIANT[capa.status as keyof typeof CAPA_STATUS_VARIANT] ?? 'neutral'}>{capa.status}</Badge>
                     {overdue && <Badge variant="overdue">Overdue</Badge>}
                   </div>
                 </div>
