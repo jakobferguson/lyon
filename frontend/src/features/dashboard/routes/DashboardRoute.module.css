@@ -26,6 +26,13 @@
   margin: 0.25rem 0 0;
 }
 
+/* Loading */
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
 /* Charts layout */
 .chartsRow {
   display: grid;

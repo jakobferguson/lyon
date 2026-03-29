@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Button } from '../../../../components/ui';
+import { useAddContributingFactor } from '../../api/investigations';
 import type { ContributingFactor, FactorCategory, FactorType, InvestigationStatus } from '../../types';
 import { FACTOR_LIBRARY } from '../../types';
 import styles from './ContributingFactorForm.module.css';
 
 interface ContributingFactorFormProps {
+  investigationId: string;
   factors: ContributingFactor[];
   status: InvestigationStatus;
 }
@@ -17,8 +19,9 @@ const CATEGORY_ICONS: Record<FactorCategory, string> = {
   Management:    '🏢',
 };
 
-export function ContributingFactorForm({ factors: initialFactors, status }: ContributingFactorFormProps) {
+export function ContributingFactorForm({ investigationId, factors: initialFactors, status }: ContributingFactorFormProps) {
   const readonly = status === 'Approved';
+  const addFactor = useAddContributingFactor();
   const [selected, setSelected] = useState<Map<string, ContributingFactor>>(
     () => new Map(initialFactors.map((f) => [f.factorId, f])),
   );
@@ -72,12 +75,22 @@ export function ContributingFactorForm({ factors: initialFactors, status }: Cont
     });
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (selected.size > 0 && primaryId === null) {
       setPrimaryError(true);
       return;
     }
     setPrimaryError(false);
+    // Save each factor via API (backend replaces all factors on each call)
+    const factors = [...selected.values()];
+    for (const factor of factors) {
+      await addFactor.mutateAsync({
+        investigationId,
+        factorTypeId: factor.factorId,
+        isPrimary: factor.isPrimary,
+        notes: factor.notes || undefined,
+      });
+    }
     setSaved(true);
   }
 
@@ -95,8 +108,8 @@ export function ContributingFactorForm({ factors: initialFactors, status }: Cont
         {!readonly && (
           <div className={styles.headerActions}>
             {saved && <span className={styles.savedIndicator}>Saved</span>}
-            <Button variant="accent" size="sm" onClick={handleSave}>
-              Save Factors
+            <Button variant="accent" size="sm" onClick={handleSave} disabled={addFactor.isPending}>
+              {addFactor.isPending ? 'Saving…' : 'Save Factors'}
             </Button>
           </div>
         )}

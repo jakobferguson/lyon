@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { IncidentForm } from '../components/IncidentForm/IncidentForm';
+import { useCreateIncident } from '../api/incidents';
 import type { IncidentFormValues } from '../types';
 import styles from './NewIncidentRoute.module.css';
 
@@ -42,6 +43,18 @@ const DEFAULT_VALUES: IncidentFormValues = {
 export function NewIncidentRoute() {
   const navigate = useNavigate();
   const methods = useForm<IncidentFormValues>({ defaultValues: DEFAULT_VALUES });
+  const createIncident = useCreateIncident();
+
+  function handleSubmit(data: IncidentFormValues, submitAsReported: boolean) {
+    createIncident.mutate(
+      { form: data, submitAsReported },
+      {
+        onSuccess: (created) => {
+          navigate(`/app/incidents/${created.id}`);
+        },
+      },
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -59,7 +72,11 @@ export function NewIncidentRoute() {
       </div>
 
       <FormProvider {...methods}>
-        <IncidentForm />
+        <IncidentForm
+          onSubmit={handleSubmit}
+          isSubmitting={createIncident.isPending}
+          submitError={createIncident.isError ? 'Failed to create incident. Please try again.' : null}
+        />
       </FormProvider>
     </div>
   );

@@ -1,0 +1,12 @@
+C:\Projects\lyon\src\Lyon.Contracts\bin\Debug\net10.0\Lyon.Contracts.deps.json
+C:\Projects\lyon\src\Lyon.Contracts\bin\Debug\net10.0\Lyon.Contracts.dll
+C:\Projects\lyon\src\Lyon.Contracts\bin\Debug\net10.0\Lyon.Contracts.pdb
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\Lyon.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\Lyon.Contracts.AssemblyInfoInputs.cache
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\Lyon.Contracts.AssemblyInfo.cs
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\Lyon.Contracts.csproj.CoreCompileInputs.cache
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\Lyon.Contracts.sourcelink.json
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\Lyon.Contracts.dll
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\refint\Lyon.Contracts.dll
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\Lyon.Contracts.pdb
+C:\Projects\lyon\src\Lyon.Contracts\obj\Debug\net10.0\ref\Lyon.Contracts.dll

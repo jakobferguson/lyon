@@ -1,0 +1,12 @@
+C:\Projects\lyon\src\Lyon.Domain\bin\Debug\net10.0\Lyon.Domain.deps.json
+C:\Projects\lyon\src\Lyon.Domain\bin\Debug\net10.0\Lyon.Domain.dll
+C:\Projects\lyon\src\Lyon.Domain\bin\Debug\net10.0\Lyon.Domain.pdb
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\Lyon.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\Lyon.Domain.AssemblyInfoInputs.cache
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\Lyon.Domain.AssemblyInfo.cs
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\Lyon.Domain.csproj.CoreCompileInputs.cache
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\Lyon.Domain.sourcelink.json
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\Lyon.Domain.dll
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\refint\Lyon.Domain.dll
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\Lyon.Domain.pdb
+C:\Projects\lyon\src\Lyon.Domain\obj\Debug\net10.0\ref\Lyon.Domain.dll

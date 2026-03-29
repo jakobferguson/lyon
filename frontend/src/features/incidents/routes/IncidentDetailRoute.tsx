@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Badge, Button } from '../../../components/ui';
-import { INCIDENT_SEED } from '../types';
+import { Badge, Button, Spinner } from '../../../components/ui';
+import { useIncidentDetail } from '../api/incidents';
+import { apiClient } from '../../../lib/api-client';
 import { STATUS_VARIANT, formatDateLong } from '../utils';
-import { INVESTIGATION_SEED } from '../../investigations/types';
+import { useInvestigationByIncident } from '../../investigations/api/investigations';
 import { INVESTIGATION_STATUS_VARIANT, formatDateOnly, getEscalationTier } from '../../investigations/utils';
 import { CAPA_SEED } from '../../capas/types';
 import { CAPA_STATUS_VARIANT, PRIORITY_VARIANT, isOverdue } from '../../capas/utils';
@@ -12,7 +13,6 @@ import { RecurrenceLinkForm } from '../../recurrence/components/RecurrenceLinkFo
 import { RecurrenceClusterView } from '../../recurrence/components/RecurrenceClusterView/RecurrenceClusterView';
 import type { RecurrenceLink } from '../../recurrence/types';
 import { useAuthStore } from '../../../stores/authStore';
-import { useNotificationStore } from '../../notifications/stores/notificationStore';
 import styles from './IncidentDetailRoute.module.css';
 
 type Tab = 'details' | 'investigation' | 'capas' | 'recurrence';
@@ -44,7 +44,16 @@ const COORDINATOR_PLUS_ROLES = ['safety_coordinator', 'safety_manager', 'divisio
 const MEDICAL_ACCESS_ROLES   = ['safety_manager', 'division_manager', 'executive', 'admin'];
 
 function InvestigationSummaryTab({ incidentId }: { incidentId: string }) {
-  const investigation = INVESTIGATION_SEED.find((inv) => inv.incidentId === incidentId);
+  const { data: investigation, isLoading } = useInvestigationByIncident(incidentId);
+
+  if (isLoading) {
+    return (
+      <div className={styles.comingSoon}>
+        <Spinner size="md" />
+      </div>
+    );
+  }
+
   if (!investigation) {
     return (
       <div className={styles.comingSoon}>
@@ -53,15 +62,18 @@ function InvestigationSummaryTab({ incidentId }: { incidentId: string }) {
       </div>
     );
   }
-  const tier = investigation.assignment
-    ? getEscalationTier(investigation.assignment.targetDate, investigation.status)
-    : 'none';
+
+  const tier = getEscalationTier(
+    investigation.targetCompletionDate,
+    investigation.status as Parameters<typeof getEscalationTier>[1],
+  );
+
   return (
     <div className={styles.investigationSummary}>
       <div className={styles.invSummaryHeader}>
         <div className={styles.invSummaryTitle}>
           <h2 className={styles.cardTitle}>Investigation Summary</h2>
-          <Badge variant={INVESTIGATION_STATUS_VARIANT[investigation.status]}>
+          <Badge variant={INVESTIGATION_STATUS_VARIANT[investigation.status as keyof typeof INVESTIGATION_STATUS_VARIANT] ?? 'neutral'}>
             {investigation.status}
           </Badge>
           {tier !== 'none' && (
@@ -82,32 +94,30 @@ function InvestigationSummaryTab({ incidentId }: { incidentId: string }) {
         <div className={styles.invSummaryCard}>
           <span className={styles.invSummaryLabel}>Lead Investigator</span>
           <span className={styles.invSummaryValue}>
-            {investigation.assignment?.leadInvestigator ?? <em>Unassigned</em>}
+            {investigation.leadInvestigator}
           </span>
         </div>
         <div className={styles.invSummaryCard}>
           <span className={styles.invSummaryLabel}>Target Date</span>
           <span className={styles.invSummaryValue}>
-            {investigation.assignment
-              ? formatDateOnly(investigation.assignment.targetDate)
-              : '—'}
+            {formatDateOnly(investigation.targetCompletionDate)}
           </span>
         </div>
         <div className={styles.invSummaryCard}>
           <span className={styles.invSummaryLabel}>5-Why Levels</span>
-          <span className={styles.invSummaryValue}>{investigation.fiveWhys.length}</span>
+          <span className={styles.invSummaryValue}>{investigation.fiveWhyEntries?.length ?? 0}</span>
         </div>
         <div className={styles.invSummaryCard}>
           <span className={styles.invSummaryLabel}>Witness Statements</span>
-          <span className={styles.invSummaryValue}>{investigation.witnessStatements.length}</span>
+          <span className={styles.invSummaryValue}>{investigation.witnessStatements?.length ?? 0}</span>
         </div>
         <div className={styles.invSummaryCard}>
           <span className={styles.invSummaryLabel}>Contributing Factors</span>
-          <span className={styles.invSummaryValue}>{investigation.contributingFactors.length}</span>
+          <span className={styles.invSummaryValue}>{investigation.contributingFactors?.length ?? 0}</span>
         </div>
         <div className={styles.invSummaryCard}>
-          <span className={styles.invSummaryLabel}>Review Cycles</span>
-          <span className={styles.invSummaryValue}>{investigation.reviews.length}</span>
+          <span className={styles.invSummaryLabel}>Reviews</span>
+          <span className={styles.invSummaryValue}>{investigation.reviewedBy ? 1 : 0}</span>
         </div>
       </div>
 
@@ -166,9 +176,8 @@ function CapasTab({ incidentId }: { incidentId: string }) {
 export function IncidentDetailRoute() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const incident = INCIDENT_SEED.find((i) => i.id === id);
+  const { data: incident, isLoading, isError } = useIncidentDetail(id!);
   const role = useAuthStore((s) => s.role);
-  const addNotification = useNotificationStore((s) => s.addNotification);
 
   const [tab, setTab] = useState<Tab>('details');
   const [recurrenceLinks, setRecurrenceLinks] = useState<RecurrenceLink[]>(
@@ -179,20 +188,33 @@ export function IncidentDetailRoute() {
   const canGenerateReport = role ? COORDINATOR_PLUS_ROLES.includes(role) : false;
   const hasMedicalAccess  = role ? MEDICAL_ACCESS_ROLES.includes(role) : false;
 
-  function handleGenerateReport() {
+  async function handleGenerateReport() {
     setPdfState('generating');
-    setTimeout(() => {
-      setPdfState('success');
-      addNotification({
-        eventType: 'report_generated',
-        title: 'Incident Report Generated',
-        summary: `PDF report for ${incident?.incidentNumber ?? id} was successfully generated.`,
-        linkTo: `/app/incidents/${id}`,
+    try {
+      const response = await apiClient.get(`/reports/incidents/${id}/pdf`, {
+        responseType: 'blob',
       });
-    }, 1800);
+      const url = URL.createObjectURL(response.data as Blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${incident?.incidentNumber ?? 'incident'}-report.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setPdfState('success');
+    } catch {
+      setPdfState('idle');
+    }
   }
 
-  if (!incident) {
+  if (isLoading) {
+    return (
+      <div className={styles.notFound}>
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (isError || !incident) {
     return (
       <div className={styles.notFound}>
         <p>Incident not found.</p>
@@ -213,7 +235,7 @@ export function IncidentDetailRoute() {
           </button>
           <div className={styles.titleRow}>
             <h1 className={styles.title}>{incident.incidentNumber}</h1>
-            <Badge variant={STATUS_VARIANT[incident.status]}>{incident.status}</Badge>
+            <Badge variant={STATUS_VARIANT[incident.status as keyof typeof STATUS_VARIANT] ?? 'neutral'}>{incident.status}</Badge>
           </div>
           <p className={styles.subtitle}>{incident.incidentType} · {formatDateLong(incident.dateTime)}</p>
         </div>

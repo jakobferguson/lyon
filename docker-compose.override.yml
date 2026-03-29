@@ -1,0 +1,10 @@
+services:
+  lyon-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Serilog__MinimumLevel__Default=Debug
+
+  lyon-worker:
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - Serilog__MinimumLevel__Default=Debug

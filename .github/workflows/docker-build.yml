@@ -1,0 +1,64 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+jobs:
+  build-api:
+    name: Build API Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/Lyon.Api/Dockerfile
+          push: false
+          tags: lyon-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-worker:
+    name: Build Worker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Worker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/Lyon.Worker/Dockerfile
+          push: false
+          tags: lyon-worker:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-client:
+    name: Build Client Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Client image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: frontend/Dockerfile
+          push: false
+          tags: lyon-client:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

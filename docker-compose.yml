@@ -1,0 +1,55 @@
+services:
+  lyon-client:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - lyon-api
+
+  lyon-api:
+    build:
+      context: .
+      dockerfile: src/Lyon.Api/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=lyon;Username=lyon;Password=lyon_dev_password
+      - Encryption__Key=0123456789abcdef0123456789abcdef
+      - SkipAuth=true
+    depends_on:
+      db:
+        condition: service_healthy
+
+  lyon-worker:
+    build:
+      context: .
+      dockerfile: src/Lyon.Worker/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=lyon;Username=lyon;Password=lyon_dev_password
+      - Encryption__Key=0123456789abcdef0123456789abcdef
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgis/postgis:16-3.4
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: lyon
+      POSTGRES_USER: lyon
+      POSTGRES_PASSWORD: lyon_dev_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lyon"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
