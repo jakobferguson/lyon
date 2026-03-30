@@ -25,7 +25,8 @@
       "Bash(docker compose:*)",
       "Bash(timeout:*)",
       "Bash(curl:*)",
-      "Bash(python -c:*)"
+      "Bash(python -c:*)",
+      "Bash(rg:*)"
     ]
   }
 }

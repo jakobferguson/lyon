@@ -58,18 +58,18 @@
 
 .table td {
   padding: 0.875rem;
-  border-bottom: 1px solid var(--color-border, rgba(255,255,255,0.06));
+  border-bottom: 1px solid var(--color-border, var(--off-white));
   color: var(--color-text-primary, #f5f5f5);
 }
 
-.table tbody tr:hover { background: rgba(255,255,255,0.03); }
+.table tbody tr:hover { background: rgba(0,0,0,0.03); }
 
 .nameCell { font-weight: 500; }
 
 .code {
   padding: 0.2rem 0.5rem;
   background: rgba(59, 130, 246, 0.15);
-  color: #93c5fd;
+  color: var(--navy-blue);
   border-radius: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
@@ -88,11 +88,11 @@
 
 .editBtn {
   background: none;
-  border-color: rgba(255,255,255,0.2);
+  border-color: var(--border-gray);
   color: var(--color-text-secondary, #9ca3af);
 }
 
-.editBtn:hover { border-color: #3b82f6; color: #93c5fd; }
+.editBtn:hover { border-color: #3b82f6; color: var(--navy-blue); }
 
 .deleteBtn {
   background: none;
@@ -115,8 +115,8 @@
 }
 
 .modal {
-  background: #1e2330;
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--white);
+  border: 1px solid var(--border-gray);
   border-radius: 0.75rem;
   padding: 1.75rem;
   width: 100%;
@@ -145,8 +145,8 @@
 
 .input {
   padding: 0.5rem 0.75rem;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--off-white);
+  border: 1px solid var(--border-gray);
   border-radius: 0.375rem;
   color: var(--color-text-primary, #f5f5f5);
   font-size: 0.875rem;
@@ -166,7 +166,7 @@
 .cancelBtn {
   padding: 0.5rem 1rem;
   background: none;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid var(--border-gray);
   border-radius: 0.375rem;
   color: var(--color-text-secondary, #9ca3af);
   font-size: 0.875rem;

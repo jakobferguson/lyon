@@ -44,6 +44,30 @@
   --sidebar-width: 200px;
   --sidebar-collapsed-width: 56px;
   --topbar-height: 56px;
+
+  /* ── Semantic color tokens (light theme) ──────────────────────── */
+  --color-text-primary: #333333;
+  --color-text-secondary: #58595B;
+  --color-text-muted: #6D6E71;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F5F5F5;
+  --color-bg-card: #FFFFFF;
+  --color-bg-subtle: #FAFAFA;
+  --color-border: #E5E5E5;
+  --color-accent: #1E3A5F;
+  --color-accent-light: #2E5A8F;
+  --color-accent-blue: #1E3A5F;
+  --color-primary: #1E3A5F;
+  --color-success: #1E6B38;
+  --color-warning: #8A5700;
+  --color-warning-bg: #FFF3CD;
+  --color-warning-text: #8A5700;
+  --color-danger: #AB2D24;
+  --color-danger-bg: #F8D7DA;
+  --color-danger-text: #AB2D24;
+  --color-overdue: #AB2D24;
+  --color-overdue-bg: #F8D7DA;
+  --color-overdue-text: #AB2D24;
 }
 
 /* ──────────────────────────────────────────

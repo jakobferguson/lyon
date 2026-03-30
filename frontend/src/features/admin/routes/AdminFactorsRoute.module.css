@@ -47,8 +47,8 @@
 
 .select {
   padding: 0.4rem 0.75rem;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--off-white);
+  border: 1px solid var(--border-gray);
   border-radius: 0.375rem;
   color: var(--color-text-primary, #f5f5f5);
   font-size: 0.875rem;
@@ -93,7 +93,7 @@
   transition: background-color 0.12s ease;
 }
 
-.factorRow:hover { background: rgba(255,255,255,0.04); }
+.factorRow:hover { background: rgba(0,0,0,0.03); }
 
 .factorRow.inactive { opacity: 0.55; }
 
@@ -125,11 +125,11 @@
 
 .editBtn {
   background: none;
-  border-color: rgba(255,255,255,0.15);
+  border-color: var(--border-gray);
   color: var(--color-text-secondary, #9ca3af);
 }
 
-.editBtn:hover { border-color: #3b82f6; color: #93c5fd; }
+.editBtn:hover { border-color: #3b82f6; color: var(--navy-blue); }
 
 .deactivateBtn {
   background: none;
@@ -160,8 +160,8 @@
 }
 
 .modal {
-  background: #1e2330;
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--white);
+  border: 1px solid var(--border-gray);
   border-radius: 0.75rem;
   padding: 1.75rem;
   width: 100%;
@@ -188,8 +188,8 @@
 
 .input {
   padding: 0.5rem 0.75rem;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--off-white);
+  border: 1px solid var(--border-gray);
   border-radius: 0.375rem;
   color: var(--color-text-primary, #f5f5f5);
   font-size: 0.875rem;
@@ -207,7 +207,7 @@
 .cancelBtn {
   padding: 0.5rem 1rem;
   background: none;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid var(--border-gray);
   border-radius: 0.375rem;
   color: var(--color-text-secondary, #9ca3af);
   font-size: 0.875rem;
