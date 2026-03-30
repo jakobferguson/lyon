@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, FormField } from '../../../../components/ui';
+import { Button, FormField, Spinner } from '../../../../components/ui';
 import type { CapaCategory, CapaFormValues, CapaPriority, CapaType } from '../../types';
-import { INCIDENT_SEED } from '../../../incidents/types';
+import { useIncidentList } from '../../../incidents/api/incidents';
 import { calculateDueDate, calculateVerificationDueDate, toDateInputValue } from '../../utils';
 import styles from './CapaForm.module.css';
+
+type SubmitHandler = (values: CapaFormValues) => void;
 
 const TYPES: CapaType[] = ['Corrective', 'Preventive'];
 const CATEGORIES: CapaCategory[] = [
@@ -34,13 +36,16 @@ const EMPTY: CapaFormValues = {
 
 interface CapaFormProps {
   initialValues?: Partial<CapaFormValues>;
-  onSubmit?: (values: CapaFormValues) => void;
+  onSubmit?: SubmitHandler;
+  isSubmitting?: boolean;
+  submitError?: string | null;
 }
 
-export function CapaForm({ initialValues, onSubmit }: CapaFormProps) {
+export function CapaForm({ initialValues, onSubmit, isSubmitting, submitError }: CapaFormProps) {
   const navigate = useNavigate();
   const [values, setValues] = useState<CapaFormValues>({ ...EMPTY, ...initialValues });
   const [errors, setErrors] = useState<Partial<Record<keyof CapaFormValues, string>>>({});
+  const { data: incidentData, isLoading: incidentsLoading } = useIncidentList({ pageSize: 100 });
 
   // Auto-calculate due dates when priority changes
   useEffect(() => {
@@ -85,8 +90,11 @@ export function CapaForm({ initialValues, onSubmit }: CapaFormProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit?.(values);
-    navigate('/app/capas');
+    if (onSubmit) {
+      onSubmit(values);
+    } else {
+      navigate('/app/capas');
+    }
   }
 
   return (
@@ -161,7 +169,8 @@ export function CapaForm({ initialValues, onSubmit }: CapaFormProps) {
         <h2 className={styles.sectionTitle}>Linked Incidents</h2>
         <p className={styles.sectionHint}>Select all incidents this CAPA addresses.</p>
         <div className={styles.incidentList}>
-          {INCIDENT_SEED.map((inc) => (
+          {incidentsLoading && <Spinner size="sm" />}
+          {(incidentData?.items ?? []).map((inc) => (
             <label key={inc.id} className={`${styles.incidentRow} ${values.linkedIncidentIds.includes(inc.id) ? styles.incidentChecked : ''}`}>
               <input
                 type="checkbox"
@@ -178,9 +187,15 @@ export function CapaForm({ initialValues, onSubmit }: CapaFormProps) {
         </div>
       </div>
 
+      {submitError && (
+        <div className={styles.errorBanner} role="alert">{submitError}</div>
+      )}
+
       <div className={styles.actions}>
         <Button type="button" variant="secondary" onClick={() => navigate('/app/capas')}>Cancel</Button>
-        <Button type="submit" variant="accent">Create CAPA</Button>
+        <Button type="submit" variant="accent" disabled={isSubmitting}>
+          {isSubmitting ? 'Creating…' : 'Create CAPA'}
+        </Button>
       </div>
     </form>
   );

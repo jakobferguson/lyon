@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useNotificationStore } from '../../stores/notificationStore';
+import { useNotifications, useNotificationCount, useMarkAllRead } from '../../api/notifications';
 import { NotificationItem } from '../NotificationItem/NotificationItem';
 import styles from './NotificationDrawer.module.css';
 
@@ -9,10 +9,13 @@ interface Props {
 }
 
 export function NotificationDrawer({ open, onClose }: Props) {
-  const notifications = useNotificationStore((s) => s.notifications);
-  const unreadCount   = useNotificationStore((s) => s.unreadCount);
-  const markAllRead   = useNotificationStore((s) => s.markAllRead);
+  const { data } = useNotifications();
+  const { data: countData } = useNotificationCount();
+  const markAllReadMutation = useMarkAllRead();
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  const notifications = data?.items ?? [];
+  const unreadCount = countData?.unreadCount ?? 0;
 
   // Close on outside click
   useEffect(() => {
@@ -36,10 +39,6 @@ export function NotificationDrawer({ open, onClose }: Props) {
     return () => document.removeEventListener('keydown', handleKey);
   }, [open, onClose]);
 
-  const sorted = [...notifications].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
-
   return (
     <>
       {open && <div className={styles.backdrop} aria-hidden onClick={onClose} />}
@@ -54,7 +53,7 @@ export function NotificationDrawer({ open, onClose }: Props) {
         <div className={styles.header}>
           <h2 className={styles.title}>Notifications</h2>
           {unreadCount > 0 && (
-            <button className={styles.markAll} onClick={markAllRead}>
+            <button className={styles.markAll} onClick={() => markAllReadMutation.mutate()}>
               Mark all read
             </button>
           )}
@@ -64,10 +63,10 @@ export function NotificationDrawer({ open, onClose }: Props) {
         </div>
 
         <div className={styles.list}>
-          {sorted.length === 0 ? (
+          {notifications.length === 0 ? (
             <p className={styles.empty}>No notifications</p>
           ) : (
-            sorted.map((n) => (
+            notifications.map((n) => (
               <NotificationItem key={n.id} notification={n} onClose={onClose} />
             ))
           )}

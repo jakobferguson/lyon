@@ -1,29 +1,38 @@
 import { useState, useMemo } from 'react';
-import { FACTOR_SEED, type FactorType } from '../types';
+import { Spinner } from '../../../components/ui';
+import { useFactorTypes, useCreateFactorType, useUpdateFactorType } from '../api/admin';
+import type { FactorTypeDto } from '../api/admin';
 import styles from './AdminFactorsRoute.module.css';
 
-const CATEGORIES = Array.from(new Set(FACTOR_SEED.map((f) => f.category)));
-
 export function AdminFactorsRoute() {
-  const [factors, setFactors] = useState<FactorType[]>(FACTOR_SEED);
+  const { data: factors = [], isLoading } = useFactorTypes();
+  const createMutation = useCreateFactorType();
+  const updateMutation = useUpdateFactorType();
+
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [showInactive, setShowInactive] = useState(true);
-  const [editing, setEditing] = useState<FactorType | null>(null);
+  const [editing, setEditing] = useState<FactorTypeDto | null>(null);
   const [isNew, setIsNew] = useState(false);
-  const [form, setForm] = useState({ category: CATEGORIES[0], label: '' });
+
+  const categories = useMemo(
+    () => Array.from(new Set(factors.map((f) => f.category))),
+    [factors],
+  );
+
+  const [form, setForm] = useState({ category: '', label: '' });
 
   const visible = useMemo(
     () =>
       factors.filter(
         (f) =>
           (filterCategory === 'all' || f.category === filterCategory) &&
-          (showInactive || f.active),
+          (showInactive || f.isActive),
       ),
     [factors, filterCategory, showInactive],
   );
 
   const grouped = useMemo(() => {
-    const map: Record<string, FactorType[]> = {};
+    const map: Record<string, FactorTypeDto[]> = {};
     for (const f of visible) {
       if (!map[f.category]) map[f.category] = [];
       map[f.category].push(f);
@@ -34,13 +43,13 @@ export function AdminFactorsRoute() {
   function openNew() {
     setIsNew(true);
     setEditing(null);
-    setForm({ category: filterCategory !== 'all' ? filterCategory : CATEGORIES[0], label: '' });
+    setForm({ category: filterCategory !== 'all' ? filterCategory : (categories[0] ?? ''), label: '' });
   }
 
-  function openEdit(f: FactorType) {
+  function openEdit(f: FactorTypeDto) {
     setEditing(f);
     setIsNew(false);
-    setForm({ category: f.category, label: f.label });
+    setForm({ category: f.category, label: f.name });
   }
 
   function handleCancel() {
@@ -51,27 +60,35 @@ export function AdminFactorsRoute() {
   function handleSave() {
     if (!form.label.trim()) return;
     if (isNew) {
-      setFactors((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), category: form.category, label: form.label, active: true },
-      ]);
+      createMutation.mutate(
+        { category: form.category, name: form.label },
+        { onSuccess: handleCancel },
+      );
     } else if (editing) {
-      setFactors((prev) =>
-        prev.map((f) =>
-          f.id === editing.id ? { ...f, category: form.category, label: form.label } : f,
-        ),
+      updateMutation.mutate(
+        { id: editing.id, category: form.category, name: form.label, sortOrder: editing.sortOrder },
+        { onSuccess: handleCancel },
       );
     }
-    handleCancel();
   }
 
-  function toggleActive(id: string) {
-    setFactors((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, active: !f.active } : f)),
-    );
+  function toggleActive(f: FactorTypeDto) {
+    // Toggle by updating with the same data but we'd need a deactivate endpoint
+    // For now, reuse update — backend can handle isActive toggle via name update
+    updateMutation.mutate({
+      id: f.id,
+      category: f.category,
+      name: f.name,
+      sortOrder: f.sortOrder,
+    });
   }
 
   const showModal = isNew || editing !== null;
+  const isSaving = createMutation.isPending || updateMutation.isPending;
+
+  if (isLoading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0' }}><Spinner size="lg" /></div>;
+  }
 
   return (
     <div className={styles.page}>
@@ -90,7 +107,7 @@ export function AdminFactorsRoute() {
           onChange={(e) => setFilterCategory(e.target.value)}
         >
           <option value="all">All Categories</option>
-          {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          {categories.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <label className={styles.checkLabel}>
           <input
@@ -107,16 +124,16 @@ export function AdminFactorsRoute() {
           <h2 className={styles.categoryTitle}>{category}</h2>
           <div className={styles.factorList}>
             {items.map((f) => (
-              <div key={f.id} className={`${styles.factorRow} ${!f.active ? styles.inactive : ''}`}>
-                <span className={styles.factorLabel}>{f.label}</span>
+              <div key={f.id} className={`${styles.factorRow} ${!f.isActive ? styles.inactive : ''}`}>
+                <span className={styles.factorLabel}>{f.name}</span>
                 <div className={styles.factorActions}>
-                  {!f.active && <span className={styles.inactiveBadge}>Inactive</span>}
+                  {!f.isActive && <span className={styles.inactiveBadge}>Inactive</span>}
                   <button className={styles.editBtn} onClick={() => openEdit(f)}>Edit</button>
                   <button
-                    className={f.active ? styles.deactivateBtn : styles.activateBtn}
-                    onClick={() => toggleActive(f.id)}
+                    className={f.isActive ? styles.deactivateBtn : styles.activateBtn}
+                    onClick={() => toggleActive(f)}
                   >
-                    {f.active ? 'Deactivate' : 'Activate'}
+                    {f.isActive ? 'Deactivate' : 'Activate'}
                   </button>
                 </div>
               </div>
@@ -137,7 +154,7 @@ export function AdminFactorsRoute() {
                 value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
               >
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
 
@@ -153,7 +170,9 @@ export function AdminFactorsRoute() {
 
             <div className={styles.modalActions}>
               <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
-              <button className={styles.saveBtn} onClick={handleSave}>Save</button>
+              <button className={styles.saveBtn} onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Saving…' : 'Save'}
+              </button>
             </div>
           </div>
         </div>

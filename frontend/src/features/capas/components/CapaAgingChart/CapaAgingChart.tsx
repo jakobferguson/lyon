@@ -1,7 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { CAPA_SEED } from '../../types';
+import { useCapaList } from '../../api/capas';
 import type { AgeBucket } from '../../utils';
-import { getAgeBucket, isOverdue } from '../../utils';
+import { getAgeBucket } from '../../utils';
 import styles from './CapaAgingChart.module.css';
 
 const BUCKETS: AgeBucket[] = ['<7d', '7–14d', '14–30d', '30–60d', '>60d'];
@@ -15,17 +15,21 @@ const BUCKET_COLORS: Record<AgeBucket, string> = {
 };
 
 export function CapaAgingChart() {
+  const { data } = useCapaList({ pageSize: 100 });
+  const allCapas = data?.items ?? [];
+
   // Only count open (non-closed) CAPAs
-  const openCapas = CAPA_SEED.filter((c) => !['Verified Effective', 'Verified Ineffective'].includes(c.status));
+  const openCapas = allCapas.filter((c) => !['VerifiedEffective', 'VerifiedIneffective', 'Verified Effective', 'Verified Ineffective'].includes(c.status));
 
   const counts = BUCKETS.map((bucket) => ({
     bucket,
-    count: openCapas.filter((c) => getAgeBucket(c.createdAt) === bucket).length,
+    // Use dueDate as a proxy since createdAt isn't on the list item
+    count: openCapas.filter((c) => getAgeBucket(c.dueDate) === bucket).length,
     color: BUCKET_COLORS[bucket],
   }));
 
   const total = openCapas.length;
-  const overdueCount = openCapas.filter(isOverdue).length;
+  const overdueCount = openCapas.filter((c) => new Date(c.dueDate) < new Date()).length;
 
   return (
     <div className={styles.wrapper}>

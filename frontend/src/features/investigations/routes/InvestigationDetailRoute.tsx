@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Badge } from '../../../components/ui';
-import { INVESTIGATION_SEED } from '../types';
+import { Badge, Spinner } from '../../../components/ui';
+import { useInvestigationDetail } from '../api/investigations';
 import { INVESTIGATION_STATUS_VARIANT, getEscalationTier } from '../utils';
 import { OverdueEscalationBanner } from '../components/OverdueEscalationBanner/OverdueEscalationBanner';
 import { InvestigationPanel } from '../components/InvestigationPanel/InvestigationPanel';
@@ -24,10 +24,18 @@ const TABS: { id: Tab; label: string }[] = [
 export function InvestigationDetailRoute() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const investigation = INVESTIGATION_SEED.find((inv) => inv.id === id);
+  const { data: investigation, isLoading, isError } = useInvestigationDetail(id!);
   const [tab, setTab] = useState<Tab>('assignment');
 
-  if (!investigation) {
+  if (isLoading) {
+    return (
+      <div className={styles.notFound}>
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (isError || !investigation) {
     return (
       <div className={styles.notFound}>
         <p>Investigation not found.</p>
@@ -38,9 +46,61 @@ export function InvestigationDetailRoute() {
     );
   }
 
-  const escalationTier = investigation.assignment
-    ? getEscalationTier(investigation.assignment.targetDate, investigation.status)
-    : 'none';
+  const escalationTier = getEscalationTier(investigation.targetCompletionDate, investigation.status as Parameters<typeof getEscalationTier>[1]);
+
+  // Map API response to the shape expected by child components
+  const mapped = {
+    id: investigation.id,
+    incidentId: investigation.incidentId,
+    incidentNumber: `INV-${investigation.investigationNumber}`,
+    severity: '' as const,
+    division: '' as const,
+    project: '',
+    status: investigation.status as import('../types').InvestigationStatus,
+    assignment: {
+      leadInvestigator: investigation.leadInvestigator,
+      leadInvestigatorId: investigation.leadInvestigatorId,
+      teamMembers: investigation.teamMembers.map((tm) => tm.displayName),
+      targetDate: investigation.targetCompletionDate,
+      assignedBy: investigation.assignedBy,
+      assignedAt: investigation.createdAt,
+    },
+    fiveWhys: investigation.fiveWhyEntries.map((e) => ({
+      id: e.id,
+      why: e.whyQuestion,
+      answer: e.answer,
+      evidence: e.supportingEvidence ?? '',
+    })),
+    rootCauseSummary: investigation.rootCauseSummary ?? '',
+    contributingFactors: investigation.contributingFactors.map((cf) => ({
+      factorId: cf.factorTypeId,
+      factorName: cf.factorName,
+      category: cf.factorCategory as import('../types').FactorCategory,
+      isPrimary: cf.isPrimary,
+      notes: cf.notes ?? '',
+    })),
+    witnessStatements: investigation.witnessStatements.map((ws) => ({
+      id: ws.id,
+      witnessName: ws.witnessName,
+      jobTitle: ws.jobTitle ?? '',
+      employer: ws.employer ?? '',
+      phone: ws.phone ?? '',
+      statementText: ws.statementText,
+      collectionDate: ws.collectionDate,
+      collectedBy: ws.collectedBy,
+      submittedAt: ws.createdAt,
+    })),
+    reviews: investigation.reviewedBy
+      ? [{
+          id: investigation.id,
+          action: (investigation.status === 'Approved' ? 'Approved' : 'Returned') as 'Approved' | 'Returned',
+          reviewedBy: investigation.reviewedBy,
+          reviewedAt: investigation.reviewedAt ?? investigation.createdAt,
+          comments: investigation.reviewComments ?? '',
+        }]
+      : [],
+    createdAt: investigation.createdAt,
+  };
 
   return (
     <div className={styles.page}>
@@ -51,30 +111,26 @@ export function InvestigationDetailRoute() {
             ← Back to Investigations
           </button>
           <div className={styles.titleRow}>
-            <h1 className={styles.title}>Investigation — {investigation.incidentNumber}</h1>
-            <Badge variant={INVESTIGATION_STATUS_VARIANT[investigation.status]}>
-              {investigation.status}
+            <h1 className={styles.title}>Investigation — {mapped.incidentNumber}</h1>
+            <Badge variant={INVESTIGATION_STATUS_VARIANT[mapped.status] ?? 'neutral'}>
+              {mapped.status}
             </Badge>
           </div>
           <div className={styles.metaRow}>
-            <span>{investigation.severity}</span>
-            <span className={styles.dot}>·</span>
-            <span>{investigation.division || 'No Division'}</span>
+            <span>{investigation.leadInvestigator}</span>
             <span className={styles.dot}>·</span>
             <Link to={`/app/incidents/${investigation.incidentId}`} className={styles.incidentLink}>
-              View Incident {investigation.incidentNumber} →
+              View Parent Incident →
             </Link>
           </div>
         </div>
       </div>
 
       {/* Escalation banner */}
-      {investigation.assignment && (
-        <OverdueEscalationBanner
-          tier={escalationTier}
-          targetDate={investigation.assignment.targetDate}
-        />
-      )}
+      <OverdueEscalationBanner
+        tier={escalationTier}
+        targetDate={investigation.targetCompletionDate}
+      />
 
       {/* Tabs */}
       <div className={styles.tabs} role="tablist">
@@ -94,33 +150,36 @@ export function InvestigationDetailRoute() {
       {/* Tab content */}
       <div role="tabpanel" className={styles.tabContent}>
         {tab === 'assignment' && (
-          <InvestigationPanel investigation={investigation} />
+          <InvestigationPanel investigation={mapped} />
         )}
 
         {tab === 'five-why' && (
           <FiveWhyBuilder
-            steps={investigation.fiveWhys}
-            rootCauseSummary={investigation.rootCauseSummary}
-            status={investigation.status}
+            investigationId={investigation.id}
+            steps={mapped.fiveWhys}
+            rootCauseSummary={mapped.rootCauseSummary}
+            status={mapped.status}
           />
         )}
 
         {tab === 'factors' && (
           <ContributingFactorForm
-            factors={investigation.contributingFactors}
-            status={investigation.status}
+            investigationId={investigation.id}
+            factors={mapped.contributingFactors}
+            status={mapped.status}
           />
         )}
 
         {tab === 'witnesses' && (
           <WitnessStatementForm
-            statements={investigation.witnessStatements}
-            status={investigation.status}
+            investigationId={investigation.id}
+            statements={mapped.witnessStatements}
+            status={mapped.status}
           />
         )}
 
         {tab === 'review' && (
-          <ReviewPanel investigation={investigation} />
+          <ReviewPanel investigation={mapped} investigationId={investigation.id} />
         )}
       </div>
     </div>

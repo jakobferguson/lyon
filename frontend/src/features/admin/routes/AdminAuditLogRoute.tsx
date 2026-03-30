@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
-import { AUDIT_LOG_SEED, type AuditLogEntry } from '../types';
+import { useState } from 'react';
 import { useAuthStore } from '../../../stores/authStore';
+import { Spinner } from '../../../components/ui';
+import { useAuditLog } from '../api/admin';
 import styles from './AdminAuditLogRoute.module.css';
 
-const ACTION_LABELS: Record<AuditLogEntry['action'], string> = {
+const ACTION_LABELS: Record<string, string> = {
   create:   'Create',
   update:   'Update',
   delete:   'Delete',
@@ -13,39 +14,28 @@ const ACTION_LABELS: Record<AuditLogEntry['action'], string> = {
   generate: 'Generate',
 };
 
-const ACTION_COLORS: Record<AuditLogEntry['action'], string> = {
-  create:   styles.actionCreate,
-  update:   styles.actionUpdate,
-  delete:   styles.actionDelete,
-  approve:  styles.actionApprove,
-  return:   styles.actionReturn,
-  verify:   styles.actionVerify,
-  generate: styles.actionGenerate,
-};
-
-const ENTITY_TYPES = Array.from(new Set(AUDIT_LOG_SEED.map((e) => e.entityType)));
+const ACTION_KEYS = Object.keys(ACTION_LABELS);
 
 export function AdminAuditLogRoute() {
   const role = useAuthStore((s) => s.role);
-  const [search, setSearch]             = useState('');
-  const [filterEntity, setFilterEntity] = useState('all');
-  const [filterAction, setFilterAction] = useState<'all' | AuditLogEntry['action']>('all');
-  const [filterUser, setFilterUser]     = useState('');
+  const [page, setPage] = useState(1);
+  const [filterEntity, setFilterEntity] = useState('');
+  const [filterAction, setFilterAction] = useState('');
   const [filterDate, setFilterDate]     = useState('');
 
   const isAdmin = role === 'admin';
 
-  const filtered = useMemo(() => {
-    return AUDIT_LOG_SEED.filter((entry) => {
-      const q = search.toLowerCase();
-      if (q && !entry.entityLabel.toLowerCase().includes(q) && !entry.userName.toLowerCase().includes(q)) return false;
-      if (filterEntity !== 'all' && entry.entityType !== filterEntity) return false;
-      if (filterAction !== 'all' && entry.action !== filterAction) return false;
-      if (filterUser && !entry.userName.toLowerCase().includes(filterUser.toLowerCase())) return false;
-      if (filterDate && !entry.timestamp.startsWith(filterDate)) return false;
-      return true;
-    });
-  }, [search, filterEntity, filterAction, filterUser, filterDate]);
+  const { data, isLoading } = useAuditLog({
+    pageNumber: page,
+    pageSize: 50,
+    entityType: filterEntity || undefined,
+    action: filterAction || undefined,
+    startDate: filterDate || undefined,
+  });
+
+  const entries = data?.items ?? [];
+  const totalCount = data?.totalCount ?? 0;
+  const totalPages = data?.totalPages ?? 1;
 
   if (!isAdmin) {
     return (
@@ -62,106 +52,111 @@ export function AdminAuditLogRoute() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Audit Log</h1>
-          <p className={styles.subtitle}>Immutable record of all system changes and actions. {AUDIT_LOG_SEED.length} entries.</p>
+          <p className={styles.subtitle}>Immutable record of all system changes and actions. {totalCount} entries.</p>
         </div>
       </div>
 
       <div className={styles.filters}>
-        <input
-          className={styles.searchInput}
-          placeholder="Search entity or user…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
         <select
           className={styles.select}
           value={filterEntity}
-          onChange={(e) => setFilterEntity(e.target.value)}
+          onChange={(e) => { setFilterEntity(e.target.value); setPage(1); }}
         >
-          <option value="all">All Entity Types</option>
-          {ENTITY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          <option value="">All Entity Types</option>
+          <option value="Incident">Incident</option>
+          <option value="Investigation">Investigation</option>
+          <option value="Capa">CAPA</option>
+          <option value="FactorType">Factor Type</option>
+          <option value="Railroad">Railroad</option>
         </select>
         <select
           className={styles.select}
           value={filterAction}
-          onChange={(e) => setFilterAction(e.target.value as typeof filterAction)}
+          onChange={(e) => { setFilterAction(e.target.value); setPage(1); }}
         >
-          <option value="all">All Actions</option>
-          {(Object.keys(ACTION_LABELS) as AuditLogEntry['action'][]).map((a) => (
+          <option value="">All Actions</option>
+          {ACTION_KEYS.map((a) => (
             <option key={a} value={a}>{ACTION_LABELS[a]}</option>
           ))}
         </select>
         <input
-          type="text"
-          className={styles.searchInput}
-          placeholder="Filter user…"
-          value={filterUser}
-          onChange={(e) => setFilterUser(e.target.value)}
-          style={{ maxWidth: '12rem' }}
-        />
-        <input
           type="date"
           className={styles.select}
           value={filterDate}
-          onChange={(e) => setFilterDate(e.target.value)}
+          onChange={(e) => { setFilterDate(e.target.value); setPage(1); }}
         />
       </div>
 
-      <p className={styles.resultCount}>{filtered.length} result{filtered.length !== 1 ? 's' : ''}</p>
+      {isLoading && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0' }}><Spinner size="lg" /></div>
+      )}
 
-      <div className={styles.tableWrap}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>User</th>
-              <th>Action</th>
-              <th>Entity</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((entry) => (
-              <tr key={entry.id}>
-                <td className={styles.timeCell}>
-                  {new Date(entry.timestamp).toLocaleString('en-US', {
-                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-                  })}
-                </td>
-                <td>{entry.userName}</td>
-                <td>
-                  <span className={`${styles.actionBadge} ${ACTION_COLORS[entry.action] ?? ''}`}>
-                    {ACTION_LABELS[entry.action]}
-                  </span>
-                </td>
-                <td>
-                  <div>
-                    <span className={styles.entityType}>{entry.entityType}</span>
-                    <span className={styles.entityLabel}>{entry.entityLabel}</span>
-                  </div>
-                </td>
-                <td className={styles.detailCell}>
-                  {entry.fieldName && (
-                    <span>
-                      <strong>{entry.fieldName}:</strong>{' '}
-                      {entry.oldValue && <><span className={styles.oldVal}>{entry.oldValue}</span> → </>}
-                      <span className={styles.newVal}>{entry.newValue}</span>
-                    </span>
-                  )}
-                  {entry.justification && (
-                    <em className={styles.justification}> "{entry.justification}"</em>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={5} className={styles.empty}>No entries match your filters.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {!isLoading && (
+        <>
+          <p className={styles.resultCount}>{entries.length} of {totalCount} result{totalCount !== 1 ? 's' : ''}</p>
+
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Entity</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <tr key={entry.id}>
+                    <td className={styles.timeCell}>
+                      {new Date(entry.timestamp).toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                      })}
+                    </td>
+                    <td>{entry.userDisplayName}</td>
+                    <td>
+                      <span className={`${styles.actionBadge} ${styles[`action${entry.action.charAt(0).toUpperCase() + entry.action.slice(1)}`] ?? ''}`}>
+                        {ACTION_LABELS[entry.action] ?? entry.action}
+                      </span>
+                    </td>
+                    <td>
+                      <div>
+                        <span className={styles.entityType}>{entry.entityType}</span>
+                      </div>
+                    </td>
+                    <td className={styles.detailCell}>
+                      {entry.fieldName && (
+                        <span>
+                          <strong>{entry.fieldName}:</strong>{' '}
+                          {entry.oldValue && <><span className={styles.oldVal}>{entry.oldValue}</span> → </>}
+                          <span className={styles.newVal}>{entry.newValue}</span>
+                        </span>
+                      )}
+                      {entry.justification && (
+                        <em className={styles.justification}> "{entry.justification}"</em>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {entries.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className={styles.empty}>No entries match your filters.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className={styles.pageBtn}>Previous</button>
+              <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
+              <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className={styles.pageBtn}>Next</button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
