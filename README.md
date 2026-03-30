@@ -24,10 +24,45 @@ lyon/
 
 ## Getting Started (Frontend)
 
+### Option 1 — Local Node
+
 ```bash
 cd frontend
+cp .env.example .env   # configure environment variables
 npm install
 npm run dev
+```
+
+The dev server starts at `http://localhost:5173`.
+
+### Option 2 — Docker
+
+Requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/).
+
+```bash
+# Build and run all services (frontend, API, worker, database)
+docker compose up --build
+
+# Or run in the background
+docker compose up --build -d
+```
+
+This starts four services:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **lyon-client** | `http://localhost:3000` | React frontend (nginx) |
+| **lyon-api** | `http://localhost:5000` | ASP.NET Core Web API |
+| **lyon-worker** | — | Background worker |
+| **db** | `localhost:5432` | PostgreSQL + PostGIS |
+
+To stop all services:
+
+```bash
+docker compose down
+
+# To also remove the database volume:
+docker compose down -v
 ```
 
 ## Frontend Structure
