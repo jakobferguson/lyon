@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Modal, Badge } from '../../../../components/ui';
+import { useReviewInvestigation } from '../../api/investigations';
 import type { Investigation, InvestigationReview, InvestigationStatus } from '../../types';
 import { formatDateShort } from '../../utils';
 import { usePermission } from '../../../../hooks/usePermission';
@@ -8,6 +9,7 @@ import styles from './ReviewPanel.module.css';
 
 interface ReviewPanelProps {
   investigation: Investigation;
+  investigationId: string;
 }
 
 const REVIEWABLE_STATUSES: InvestigationStatus[] = ['Complete', 'In Progress', 'Returned'];
@@ -30,8 +32,9 @@ function ReviewHistoryItem({ review }: { review: InvestigationReview }) {
   );
 }
 
-export function ReviewPanel({ investigation }: ReviewPanelProps) {
+export function ReviewPanel({ investigation, investigationId }: ReviewPanelProps) {
   const canReview = usePermission('safety_manager');
+  const reviewMutation = useReviewInvestigation();
   const user = useAuthStore((s) => s.user);
   const userName = user?.name ?? 'Unknown User';
   const [reviews, setReviews] = useState<InvestigationReview[]>(investigation.reviews);
@@ -46,16 +49,20 @@ export function ReviewPanel({ investigation }: ReviewPanelProps) {
   const isApproved = status === 'Approved';
 
   function submitApproval() {
-    const newReview: InvestigationReview = {
-      id: crypto.randomUUID(),
-      action: 'Approved',
-      reviewedBy: userName,
-      reviewedAt: new Date().toISOString(),
-      comments: '',
-    };
-    setReviews((prev) => [...prev, newReview]);
-    setStatus('Approved');
-    setApproveModalOpen(false);
+    reviewMutation.mutate({ investigationId, action: 'approve' }, {
+      onSuccess: () => {
+        const newReview: InvestigationReview = {
+          id: crypto.randomUUID(),
+          action: 'Approved',
+          reviewedBy: userName,
+          reviewedAt: new Date().toISOString(),
+          comments: '',
+        };
+        setReviews((prev) => [...prev, newReview]);
+        setStatus('Approved');
+        setApproveModalOpen(false);
+      },
+    });
   }
 
   function submitReturn() {
@@ -63,18 +70,22 @@ export function ReviewPanel({ investigation }: ReviewPanelProps) {
       setReturnCommentError('Comments are required when returning an investigation.');
       return;
     }
-    const newReview: InvestigationReview = {
-      id: crypto.randomUUID(),
-      action: 'Returned',
-      reviewedBy: userName,
-      reviewedAt: new Date().toISOString(),
-      comments: returnComment.trim(),
-    };
-    setReviews((prev) => [...prev, newReview]);
-    setStatus('Returned');
-    setReturnComment('');
-    setReturnCommentError('');
-    setReturnModalOpen(false);
+    reviewMutation.mutate({ investigationId, action: 'return', comments: returnComment.trim() }, {
+      onSuccess: () => {
+        const newReview: InvestigationReview = {
+          id: crypto.randomUUID(),
+          action: 'Returned',
+          reviewedBy: userName,
+          reviewedAt: new Date().toISOString(),
+          comments: returnComment.trim(),
+        };
+        setReviews((prev) => [...prev, newReview]);
+        setStatus('Returned');
+        setReturnComment('');
+        setReturnCommentError('');
+        setReturnModalOpen(false);
+      },
+    });
   }
 
   function handleReturnClose() {
@@ -157,7 +168,9 @@ export function ReviewPanel({ investigation }: ReviewPanelProps) {
           </p>
           <div className={styles.confirmActions}>
             <Button variant="secondary" onClick={() => setApproveModalOpen(false)}>Cancel</Button>
-            <Button variant="accent" onClick={submitApproval}>Confirm Approval</Button>
+            <Button variant="accent" onClick={submitApproval} disabled={reviewMutation.isPending}>
+              {reviewMutation.isPending ? 'Approving…' : 'Confirm Approval'}
+            </Button>
           </div>
         </div>
       </Modal>
@@ -189,7 +202,9 @@ export function ReviewPanel({ investigation }: ReviewPanelProps) {
           </div>
           <div className={styles.returnActions}>
             <Button variant="secondary" onClick={handleReturnClose}>Cancel</Button>
-            <Button variant="accent" onClick={submitReturn}>Return Investigation</Button>
+            <Button variant="accent" onClick={submitReturn} disabled={reviewMutation.isPending}>
+              {reviewMutation.isPending ? 'Returning…' : 'Return Investigation'}
+            </Button>
           </div>
         </div>
       </Modal>

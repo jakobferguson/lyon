@@ -1,5 +1,6 @@
+import { useCapaList } from '../../api/capas';
 import { computeKpis } from '../../utils';
-import { CAPA_SEED } from '../../types';
+import type { Capa } from '../../types';
 import styles from './CapaKpiCards.module.css';
 
 interface KpiCardProps {
@@ -20,7 +21,19 @@ function KpiCard({ label, value, sub, variant = 'default' }: KpiCardProps) {
 }
 
 export function CapaKpiCards() {
-  const { open, overdue, effectivenessRate, avgCloseDays } = computeKpis(CAPA_SEED);
+  const { data } = useCapaList({ pageSize: 100 });
+  const items = data?.items ?? [];
+
+  // Map API items to the shape computeKpis expects
+  const mapped = items.map((c) => ({
+    status: c.status,
+    dueDate: c.dueDate,
+    createdAt: '', // not available from list item
+    verifiedAt: null as string | null,
+    completedAt: null as string | null,
+  })) as Pick<Capa, 'status' | 'dueDate' | 'createdAt' | 'verifiedAt' | 'completedAt'>[];
+
+  const { open, overdue, effectivenessRate, avgCloseDays } = computeKpis(mapped as Capa[]);
 
   return (
     <div className={styles.grid}>

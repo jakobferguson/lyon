@@ -1,29 +1,37 @@
 import { useNavigate } from 'react-router-dom';
-import { type AppNotification, EVENT_ICONS } from '../../types';
-import { useNotificationStore } from '../../stores/notificationStore';
+import { EVENT_ICONS } from '../../types';
+import type { NotificationDto } from '../../api/notifications';
+import { useMarkRead } from '../../api/notifications';
 import { formatRelativeTime } from '../../../../utils/dates';
 import styles from './NotificationItem.module.css';
 
 interface Props {
-  notification: AppNotification;
+  notification: NotificationDto;
   onClose: () => void;
 }
 
 export function NotificationItem({ notification, onClose }: Props) {
-  const markRead = useNotificationStore((s) => s.markRead);
+  const markReadMutation = useMarkRead();
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    markRead(notification.id);
-    onClose();
-    navigate(notification.linkTo);
-  };
+  const icon = EVENT_ICONS[notification.type as keyof typeof EVENT_ICONS] ?? '🔔';
 
-  const icon = EVENT_ICONS[notification.eventType] ?? '🔔';
+  // Build a navigation link from entityType/entityId
+  const linkTo = notification.entityType && notification.entityId
+    ? `/app/${notification.entityType}/${notification.entityId}`
+    : '/app';
+
+  const handleClick = () => {
+    if (!notification.isRead) {
+      markReadMutation.mutate(notification.id);
+    }
+    onClose();
+    navigate(linkTo);
+  };
 
   return (
     <button
-      className={`${styles.item} ${!notification.read ? styles.unread : ''}`}
+      className={`${styles.item} ${!notification.isRead ? styles.unread : ''}`}
       onClick={handleClick}
     >
       <span className={styles.icon} aria-hidden>{icon}</span>
@@ -34,7 +42,7 @@ export function NotificationItem({ notification, onClose }: Props) {
         <p className={styles.timestamp}>{formatRelativeTime(notification.createdAt)}</p>
       </div>
 
-      {!notification.read && <span className={styles.dot} aria-label="Unread" />}
+      {!notification.isRead && <span className={styles.dot} aria-label="Unread" />}
     </button>
   );
 }

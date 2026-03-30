@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Button, Modal } from '../../../../components/ui';
+import { useAddWitnessStatement } from '../../api/investigations';
 import type { InvestigationStatus, WitnessStatement } from '../../types';
 import { formatDateOnly, formatDateShort } from '../../utils';
 import { useAuthStore } from '../../../../stores/authStore';
 import styles from './WitnessStatementForm.module.css';
 
 interface WitnessStatementFormProps {
+  investigationId: string;
   statements: WitnessStatement[];
   status: InvestigationStatus;
 }
@@ -65,8 +67,9 @@ function StatementCard({ statement, index }: { statement: WitnessStatement; inde
   );
 }
 
-export function WitnessStatementForm({ statements: initialStatements, status }: WitnessStatementFormProps) {
+export function WitnessStatementForm({ investigationId, statements: initialStatements, status }: WitnessStatementFormProps) {
   const readonly = status === 'Approved';
+  const addStatement = useAddWitnessStatement();
   const user = useAuthStore((s) => s.user);
   const userName = user?.name ?? 'Unknown User';
   const [statements, setStatements] = useState<WitnessStatement[]>(initialStatements);
@@ -86,22 +89,34 @@ export function WitnessStatementForm({ statements: initialStatements, status }: 
   function handleSubmit() {
     if (!validate()) return;
 
-    const newStatement: WitnessStatement = {
-      id: crypto.randomUUID(),
+    addStatement.mutate({
+      investigationId,
       witnessName: form.witnessName.trim(),
-      jobTitle: form.jobTitle.trim(),
-      employer: form.employer.trim(),
-      phone: form.phone.trim(),
+      jobTitle: form.jobTitle.trim() || undefined,
+      employer: form.employer.trim() || undefined,
+      phone: form.phone.trim() || undefined,
       statementText: form.statementText.trim(),
       collectionDate: form.collectionDate,
-      collectedBy: userName,
-      submittedAt: new Date().toISOString(),
-    };
-
-    setStatements((prev) => [...prev, newStatement]);
-    setForm(EMPTY_FORM);
-    setErrors({});
-    setModalOpen(false);
+    }, {
+      onSuccess: () => {
+        // Optimistically add to local state while query refetches
+        const newStatement: WitnessStatement = {
+          id: crypto.randomUUID(),
+          witnessName: form.witnessName.trim(),
+          jobTitle: form.jobTitle.trim(),
+          employer: form.employer.trim(),
+          phone: form.phone.trim(),
+          statementText: form.statementText.trim(),
+          collectionDate: form.collectionDate,
+          collectedBy: userName,
+          submittedAt: new Date().toISOString(),
+        };
+        setStatements((prev) => [...prev, newStatement]);
+        setForm(EMPTY_FORM);
+        setErrors({});
+        setModalOpen(false);
+      },
+    });
   }
 
   function handleClose() {
@@ -227,7 +242,9 @@ export function WitnessStatementForm({ statements: initialStatements, status }: 
 
           <div className={styles.modalActions}>
             <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-            <Button variant="accent" onClick={handleSubmit}>Submit Statement</Button>
+            <Button variant="accent" onClick={handleSubmit} disabled={addStatement.isPending}>
+              {addStatement.isPending ? 'Submitting…' : 'Submit Statement'}
+            </Button>
           </div>
         </div>
       </Modal>

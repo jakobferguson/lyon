@@ -1,18 +1,14 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Badge, Button, FormField } from '../../../components/ui';
+import { Badge, Button, FormField, Spinner } from '../../../components/ui';
 import { useAuthStore } from '../../../stores/authStore';
-import type { Capa, CapaStatus } from '../types';
-import { CAPA_SEED } from '../types';
-import { INCIDENT_SEED } from '../../incidents/types';
+import type { CapaStatus } from '../types';
+import { useCapaDetail, useTransitionCapa } from '../api/capas';
 import {
   CAPA_STATUS_VARIANT,
   PRIORITY_VARIANT,
   formatDateOnly,
   formatDateShort,
-  isOverdue,
-  calculateVerificationDueDate,
-  toDateInputValue,
 } from '../utils';
 import { CapaStatusStepper } from '../components/CapaStatusStepper/CapaStatusStepper';
 import { CapaVerificationForm } from '../components/CapaVerificationForm/CapaVerificationForm';
@@ -22,14 +18,25 @@ export function CapaDetailRoute() {
   const { id }    = useParams<{ id: string }>();
   const navigate  = useNavigate();
   const { user }  = useAuthStore();
+  const { data: capa, isLoading, isError } = useCapaDetail(id!);
+  const transitionMutation = useTransitionCapa();
 
-  const seed = CAPA_SEED.find((c) => c.id === id);
-  const [capa, setCapa] = useState<Capa | undefined>(seed);
+  const [completionNotes, setCompletionNotes] = useState('');
+  const [notesInitialized, setNotesInitialized] = useState(false);
 
-  const [completionNotes, setCompletionNotes] = useState(capa?.completionNotes ?? '');
-  const [savingNotes, setSavingNotes]         = useState(false);
+  // Initialize completionNotes from server data once
+  if (capa && !notesInitialized) {
+    setCompletionNotes(capa.completionNotes ?? '');
+    setNotesInitialized(true);
+  }
 
-  if (!capa) {
+  if (isLoading) {
+    return (
+      <div className={styles.notFound}><Spinner size="lg" /></div>
+    );
+  }
+
+  if (isError || !capa) {
     return (
       <div className={styles.notFound}>
         <h2>CAPA not found</h2>
@@ -41,41 +48,32 @@ export function CapaDetailRoute() {
   const currentUserId   = user?.id   ?? '';
   const currentUserName = user?.name ?? 'Unknown User';
   const isAssignee      = currentUserId === capa.assignedToId;
-  const overdue         = isOverdue(capa);
-
-  const linkedIncidents = INCIDENT_SEED.filter((inc) => capa.linkedIncidentIds.includes(inc.id));
+  const overdue         = new Date(capa.dueDate) < new Date() && !['Verified Effective', 'Verified Ineffective'].includes(capa.status);
 
   function handleAdvance(next: CapaStatus) {
-    setCapa((prev) => {
-      if (!prev) return prev;
-      const updates: Partial<Capa> = { status: next };
-      if (next === 'Completed') {
-        updates.completedAt = new Date().toISOString();
-        updates.completionNotes = completionNotes;
-      }
-      if (next === 'Verification Pending') {
-        const verDue = calculateVerificationDueDate(prev.priority, new Date());
-        updates.verificationDueDate = toDateInputValue(verDue);
-      }
-      return { ...prev, ...updates };
+    transitionMutation.mutate({
+      id: capa!.id,
+      newStatus: next,
+      completionNotes: next === 'Completed' ? completionNotes : undefined,
     });
   }
 
   function handleVerify(outcome: 'Verified Effective' | 'Verified Ineffective', notes: string) {
-    setCapa((prev) => prev ? {
-      ...prev,
-      status: outcome,
-      verifiedBy: currentUserName,
-      verifiedById: currentUserId,
-      verifiedAt: new Date().toISOString(),
+    transitionMutation.mutate({
+      id: capa!.id,
+      newStatus: outcome,
       verificationNotes: notes,
-    } : prev);
+      verifiedById: currentUserId,
+    });
   }
 
   function handleSaveNotes() {
-    setCapa((prev) => prev ? { ...prev, completionNotes } : prev);
-    setSavingNotes(true);
-    requestAnimationFrame(() => setSavingNotes(false));
+    // Save notes by transitioning to same status with updated notes
+    transitionMutation.mutate({
+      id: capa!.id,
+      newStatus: capa!.status,
+      completionNotes,
+    });
   }
 
   return (
@@ -91,8 +89,8 @@ export function CapaDetailRoute() {
             <p className={styles.type}>{capa.type} · {capa.category}</p>
           </div>
           <div className={styles.badges}>
-            <Badge variant={PRIORITY_VARIANT[capa.priority]}>{capa.priority}</Badge>
-            <Badge variant={CAPA_STATUS_VARIANT[capa.status]}>{capa.status}</Badge>
+            <Badge variant={PRIORITY_VARIANT[capa.priority as keyof typeof PRIORITY_VARIANT] ?? 'neutral'}>{capa.priority}</Badge>
+            <Badge variant={CAPA_STATUS_VARIANT[capa.status as keyof typeof CAPA_STATUS_VARIANT] ?? 'neutral'}>{capa.status}</Badge>
             {overdue && <Badge variant="overdue">Overdue</Badge>}
           </div>
         </div>
@@ -112,7 +110,7 @@ export function CapaDetailRoute() {
           <section className={styles.card}>
             <h2 className={styles.cardTitle}>Status & Progress</h2>
             <CapaStatusStepper
-              status={capa.status}
+              status={capa.status as CapaStatus}
               onAdvance={handleAdvance}
               isAssignee={isAssignee}
             />
@@ -145,8 +143,8 @@ export function CapaDetailRoute() {
                     )}
                   </FormField>
                   <div className={styles.notesAction}>
-                    <Button variant="secondary" onClick={handleSaveNotes} disabled={savingNotes}>
-                      {savingNotes ? 'Saving…' : 'Save Notes'}
+                    <Button variant="secondary" onClick={handleSaveNotes} disabled={transitionMutation.isPending}>
+                      {transitionMutation.isPending ? 'Saving…' : 'Save Notes'}
                     </Button>
                   </div>
                 </>
@@ -161,16 +159,31 @@ export function CapaDetailRoute() {
             <section className={styles.card}>
               <h2 className={styles.cardTitle}>Verification</h2>
               <CapaVerificationForm
-                capa={capa}
+                capa={{
+                  ...capa,
+                  assignedToId: capa.assignedToId,
+                  verifiedById: capa.verifiedById ?? null,
+                  verifiedBy: capa.verifiedBy ?? null,
+                  verifiedAt: capa.verifiedAt ?? null,
+                  verificationNotes: capa.verificationNotes ?? '',
+                  completionNotes: capa.completionNotes ?? '',
+                  status: capa.status as CapaStatus,
+                  priority: capa.priority as import('../types').CapaPriority,
+                  type: capa.type as import('../types').CapaType,
+                  category: capa.category as import('../types').CapaCategory,
+                  dueDate: capa.dueDate,
+                  verificationDueDate: capa.verificationDueDate ?? '',
+                  verificationMethod: capa.verificationMethod ?? '',
+                  linkedIncidentIds: capa.linkedIncidents?.map((i) => i.id) ?? [],
+                  linkedInvestigationId: null,
+                  createdBy: '',
+                  completedAt: capa.completedAt ?? null,
+                }}
                 currentUserId={currentUserId}
                 currentUserName={currentUserName}
                 onVerify={handleVerify}
                 onNewCapa={() => navigate('/app/capas/new')}
-                onReopenInvestigation={() =>
-                  capa.linkedInvestigationId
-                    ? navigate(`/app/investigations/${capa.linkedInvestigationId}`)
-                    : navigate('/app/investigations')
-                }
+                onReopenInvestigation={() => navigate('/app/investigations')}
               />
             </section>
           )}
@@ -184,10 +197,9 @@ export function CapaDetailRoute() {
             <h2 className={styles.cardTitle}>Details</h2>
             <dl className={styles.dl}>
               <dt>Assigned To</dt>   <dd>{capa.assignedTo}</dd>
-              <dt>Priority</dt>      <dd><Badge variant={PRIORITY_VARIANT[capa.priority]}>{capa.priority}</Badge></dd>
+              <dt>Priority</dt>      <dd><Badge variant={PRIORITY_VARIANT[capa.priority as keyof typeof PRIORITY_VARIANT] ?? 'neutral'}>{capa.priority}</Badge></dd>
               <dt>Action Due</dt>    <dd className={overdue ? styles.overdueText : ''}>{formatDateOnly(capa.dueDate)}</dd>
-              <dt>Verification Due</dt><dd>{formatDateOnly(capa.verificationDueDate)}</dd>
-              <dt>Created By</dt>    <dd>{capa.createdBy}</dd>
+              <dt>Verification Due</dt><dd>{capa.verificationDueDate ? formatDateOnly(capa.verificationDueDate) : '—'}</dd>
               <dt>Created At</dt>    <dd>{formatDateShort(capa.createdAt)}</dd>
             </dl>
           </div>
@@ -195,37 +207,27 @@ export function CapaDetailRoute() {
           {/* Verification Method */}
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Verification Method</h2>
-            <p className={styles.body}>{capa.verificationMethod}</p>
+            <p className={styles.body}>{capa.verificationMethod ?? '—'}</p>
           </div>
 
           {/* Linked Incidents */}
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Linked Incidents</h2>
-            {linkedIncidents.length === 0 ? (
+            {(!capa.linkedIncidents || capa.linkedIncidents.length === 0) ? (
               <p className={styles.muted}>No incidents linked.</p>
             ) : (
               <ul className={styles.linkList}>
-                {linkedIncidents.map((inc) => (
+                {capa.linkedIncidents.map((inc) => (
                   <li key={inc.id}>
                     <Link to={`/app/incidents/${inc.id}`} className={styles.incLink}>
                       <span className={styles.incNum}>{inc.incidentNumber}</span>
-                      <span className={styles.incDesc}>{inc.incidentType} · {inc.division}</span>
+                      <span className={styles.incDesc}>{inc.incidentType}</span>
                     </Link>
                   </li>
                 ))}
               </ul>
             )}
           </div>
-
-          {/* Linked Investigation */}
-          {capa.linkedInvestigationId && (
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Linked Investigation</h2>
-              <Link to={`/app/investigations/${capa.linkedInvestigationId}`} className={styles.invLink}>
-                View Investigation →
-              </Link>
-            </div>
-          )}
         </aside>
       </div>
     </div>

@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Lyon.Api/Lyon.Api.csproj" />
+    <Project Path="src/Lyon.Application/Lyon.Application.csproj" />
+    <Project Path="src/Lyon.Contracts/Lyon.Contracts.csproj" />
+    <Project Path="src/Lyon.Domain/Lyon.Domain.csproj" />
+    <Project Path="src/Lyon.Infrastructure/Lyon.Infrastructure.csproj" />
+    <Project Path="src/Lyon.Worker/Lyon.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Lyon.Api.Tests/Lyon.Api.Tests.csproj" />
+    <Project Path="tests/Lyon.Application.Tests/Lyon.Application.Tests.csproj" />
+    <Project Path="tests/Lyon.Architecture.Tests/Lyon.Architecture.Tests.csproj" />
+    <Project Path="tests/Lyon.Domain.Tests/Lyon.Domain.Tests.csproj" />
+    <Project Path="tests/Lyon.Infrastructure.Tests/Lyon.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

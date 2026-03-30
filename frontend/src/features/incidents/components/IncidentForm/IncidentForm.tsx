@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { FormField, Button, Tooltip } from '../../../../components/ui';
+import { FormField, Button } from '../../../../components/ui';
 import { LocationPicker } from '../LocationPicker/LocationPicker';
 import { PhotoUpload } from '../PhotoUpload/PhotoUpload';
 import { OshaWizard } from '../OshaWizard/OshaWizard';
@@ -182,10 +182,15 @@ function PhotoSection() {
 
 // ── Accordion/Stepper shell ──────────────────────────────────────────────
 
-export function IncidentForm() {
+interface IncidentFormProps {
+  onSubmit: (data: IncidentFormValues, submitAsReported: boolean) => void;
+  isSubmitting?: boolean;
+  submitError?: string | null;
+}
+
+export function IncidentForm({ onSubmit: onSubmitProp, isSubmitting, submitError }: IncidentFormProps) {
   const { handleSubmit } = useFormContext<IncidentFormValues>();
   const [openSection, setOpenSection] = useState<string>('quick');
-  const [submitted, setSubmitted]     = useState(false);
 
   const sections: Section[] = [
     { id: 'quick',    label: '1. Quick Report',          content: <QuickReportSection /> },
@@ -195,30 +200,17 @@ export function IncidentForm() {
     { id: 'photos',   label: '5. Photos',                content: <PhotoSection /> },
   ];
 
-  function onSubmit(data: IncidentFormValues) {
-    if (import.meta.env.DEV) {
-      console.log('[Dev] Incident form submitted:', data);
-    }
-    setSubmitted(true);
-  }
-
-  if (submitted) {
-    return (
-      <div className={styles.successCard}>
-        <span className={styles.successIcon} aria-hidden="true">✅</span>
-        <h2 className={styles.successTitle}>Incident Reported</h2>
-        <p className={styles.successMsg}>
-          Your incident report has been submitted successfully. An incident number will be assigned once the backend is connected.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form onSubmit={handleSubmit((data) => onSubmitProp(data, true))} noValidate>
       <div className={styles.completionWrap}>
         <CompletionBar />
       </div>
+
+      {submitError && (
+        <div className={styles.errorBanner} role="alert">
+          {submitError}
+        </div>
+      )}
 
       {/* Accordion (desktop) / Stepper (mobile) */}
       <div className={styles.sections}>
@@ -246,12 +238,17 @@ export function IncidentForm() {
       </div>
 
       <div className={styles.formActions}>
-        <Tooltip content="Save Draft will be available once the API is connected." side="top">
-          <span>
-            <Button type="button" variant="secondary" disabled>Save Draft</Button>
-          </span>
-        </Tooltip>
-        <Button type="submit" variant="accent">Submit Report</Button>
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={isSubmitting}
+          onClick={handleSubmit((data) => onSubmitProp(data, false))}
+        >
+          Save Draft
+        </Button>
+        <Button type="submit" variant="accent" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting…' : 'Submit Report'}
+        </Button>
       </div>
     </form>
   );

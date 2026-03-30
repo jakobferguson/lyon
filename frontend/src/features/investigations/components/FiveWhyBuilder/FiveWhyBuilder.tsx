@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Button } from '../../../../components/ui';
+import { useSubmitFiveWhy } from '../../api/investigations';
 import type { FiveWhyStep, InvestigationStatus } from '../../types';
 import styles from './FiveWhyBuilder.module.css';
 
 interface FiveWhyBuilderProps {
+  investigationId: string;
   steps: FiveWhyStep[];
   rootCauseSummary: string;
   status: InvestigationStatus;
@@ -125,8 +127,9 @@ function FiveWhyStepCard({
   );
 }
 
-export function FiveWhyBuilder({ steps: initialSteps, rootCauseSummary: initialSummary, status }: FiveWhyBuilderProps) {
+export function FiveWhyBuilder({ investigationId, steps: initialSteps, rootCauseSummary: initialSummary, status }: FiveWhyBuilderProps) {
   const readonly = status === 'Approved';
+  const submitFiveWhy = useSubmitFiveWhy();
   const [steps, setSteps] = useState<FiveWhyStep[]>(
     initialSteps.length >= MIN_STEPS
       ? initialSteps
@@ -161,7 +164,19 @@ export function FiveWhyBuilder({ steps: initialSteps, rootCauseSummary: initialS
   }
 
   function handleSave() {
-    setSaved(true);
+    const effectiveSummary = summaryTouched ? rootCauseSummary : (rootCauseSummary || steps[steps.length - 1]?.answer);
+    submitFiveWhy.mutate({
+      investigationId,
+      entries: steps.map((s, i) => ({
+        level: i + 1,
+        whyQuestion: s.why,
+        answer: s.answer,
+        supportingEvidence: s.evidence || undefined,
+      })),
+      rootCauseSummary: effectiveSummary || undefined,
+    }, {
+      onSuccess: () => setSaved(true),
+    });
   }
 
   const lastFinalAnswer = steps[steps.length - 1]?.answer;
@@ -181,8 +196,8 @@ export function FiveWhyBuilder({ steps: initialSteps, rootCauseSummary: initialS
             <Button variant="secondary" size="sm" onClick={addStep}>
               + Add Why
             </Button>
-            <Button variant="accent" size="sm" onClick={handleSave}>
-              Save Analysis
+            <Button variant="accent" size="sm" onClick={handleSave} disabled={submitFiveWhy.isPending}>
+              {submitFiveWhy.isPending ? 'Saving…' : 'Save Analysis'}
             </Button>
           </div>
         )}

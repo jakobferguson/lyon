@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useNotificationStore } from '../../stores/notificationStore';
+import { useNotificationCount } from '../../api/notifications';
 import { NotificationDrawer } from '../NotificationDrawer/NotificationDrawer';
 import styles from './NotificationBell.module.css';
 
 export function NotificationBell() {
-  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const { data } = useNotificationCount();
+  const unreadCount = data?.unreadCount ?? 0;
   const [open, setOpen] = useState(false);
 
   return (

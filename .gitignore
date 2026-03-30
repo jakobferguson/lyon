@@ -6,9 +6,14 @@ frontend/.env
 frontend/.env.local
 frontend/.env.*.local
 
-# ── Backend (future) ────────────────────────────────────────────────────────
-backend/bin
-backend/obj
+# ── .NET Backend ───────────────────────────────────────────────────────────
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.suo
+*.ntvs*
+*.njsproj
 
 # ── Logs ────────────────────────────────────────────────────────────────────
 logs
@@ -20,12 +25,9 @@ pnpm-debug.log*
 
 # ── OS / Editor ─────────────────────────────────────────────────────────────
 .DS_Store
+Thumbs.db
 .vite
 .vscode/*
 !.vscode/extensions.json
 .idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
