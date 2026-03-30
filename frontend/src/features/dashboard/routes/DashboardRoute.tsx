@@ -65,7 +65,7 @@ function mapIncidentTrend(points: MonthlyTrendPoint[]): MonthlyIncidentRecord[] 
     const rec = byMonth.get(key)!;
     const cat = pt.category ?? '';
     if (cat in rec) {
-      (rec as Record<string, number>)[cat] = pt.value;
+      (rec as unknown as Record<string, number>)[cat] = pt.value;
     }
   }
 
@@ -93,7 +93,7 @@ function mapDivisionBreakdown(items: DivisionBreakdownItem[]): DivisionIncidentR
     }
     const rec = byDiv.get(item.division)!;
     if (item.incidentType in rec) {
-      (rec as Record<string, number | string>)[item.incidentType] = item.count;
+      (rec as unknown as Record<string, number | string>)[item.incidentType] = item.count;
     }
   }
 
@@ -151,7 +151,10 @@ function mapRecentIncidents(items: DashboardResponse['recentIncidents']): Incide
     severity: (inc.severity || '') as Incident['severity'],
     status: inc.status as Incident['status'],
     description: inc.description,
-    location: inc.location,
+    location: {
+      ...inc.location,
+      gpsSource: (inc.location.gpsSource ?? 'manual') as 'manual' | 'gps',
+    },
     reportedBy: inc.reportedBy,
   }));
 }
@@ -208,7 +211,7 @@ export function DashboardRoute() {
   );
 
   const recentIncidents = useMemo(
-    () => dashboardData ? mapRecentIncidents(dashboardData) : [],
+    () => dashboardData ? mapRecentIncidents(dashboardData.recentIncidents) : [],
     [dashboardData],
   );
 

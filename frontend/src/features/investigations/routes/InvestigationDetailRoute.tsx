@@ -53,9 +53,9 @@ export function InvestigationDetailRoute() {
     id: investigation.id,
     incidentId: investigation.incidentId,
     incidentNumber: `INV-${investigation.investigationNumber}`,
-    severity: '' as const,
-    division: '' as const,
-    project: '',
+    severity: undefined,
+    division: undefined,
+    project: undefined,
     status: investigation.status as import('../types').InvestigationStatus,
     assignment: {
       leadInvestigator: investigation.leadInvestigator,

@@ -55,7 +55,7 @@ export const adminKeys = {
   divisions: () => [...adminKeys.all, 'divisions'] as const,
   railroads: () => [...adminKeys.all, 'railroads'] as const,
   factorTypes: () => [...adminKeys.all, 'factor-types'] as const,
-  auditLog: (params: Record<string, unknown>) => [...adminKeys.all, 'audit-log', params] as const,
+  auditLog: (params: AuditLogParams) => [...adminKeys.all, 'audit-log', params] as const,
 };
 
 // ── Queries ─────────────────────────────────────────────────────────────────

@@ -98,7 +98,7 @@ export interface RailroadNotificationDto {
 export const incidentKeys = {
   all: ['incidents'] as const,
   lists: () => [...incidentKeys.all, 'list'] as const,
-  list: (params: Record<string, unknown>) => [...incidentKeys.lists(), params] as const,
+  list: (params: IncidentListParams) => [...incidentKeys.lists(), params] as const,
   details: () => [...incidentKeys.all, 'detail'] as const,
   detail: (id: string) => [...incidentKeys.details(), id] as const,
 };

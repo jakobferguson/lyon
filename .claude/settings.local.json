@@ -5,7 +5,27 @@
       "WebFetch(domain:github.com)",
       "Bash(wc:*)",
       "Bash(ls:*)",
-      "Bash(npm --prefix frontend run build)"
+      "Bash(npm --prefix frontend run build)",
+      "Bash(dotnet:*)",
+      "Bash(dir:*)",
+      "Bash(powershell -c:*)",
+      "Bash(npx tsc:*)",
+      "Bash(if not exist \"C:\\\\Projects\\\\lyon\\\\frontend\\\\src\\\\features\\\\dashboard\\\\api\" mkdir \"C:\\\\Projects\\\\lyon\\\\frontend\\\\src\\\\features\\\\dashboard\\\\api\")",
+      "Bash(git diff:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git rm:*)",
+      "Bash(grep:*)",
+      "Bash(git -C \"C:\\\\Projects\\\\lyon\" log --oneline --all)",
+      "Bash(gh pr list:*)",
+      "Bash(powershell:*)",
+      "Bash(docker compose:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(python -c:*)"
     ]
   }
 }

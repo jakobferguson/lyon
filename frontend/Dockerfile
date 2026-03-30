@@ -5,6 +5,11 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 
 COPY . .
+
+# Dev auth mode; API calls go through nginx proxy on same origin
+ENV VITE_API_URL=""
+ENV VITE_DEV_AUTH=true
+
 RUN npm run build
 
 FROM nginx:alpine AS final

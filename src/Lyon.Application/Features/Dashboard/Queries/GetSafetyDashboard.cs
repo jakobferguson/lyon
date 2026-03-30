@@ -63,6 +63,98 @@ public class GetSafetyDashboardQueryHandler : IRequestHandler<GetSafetyDashboard
             .Where(ip => ip.Incident.DateTime >= yearStart && ip.Incident.DateTime <= now && ip.DaysAway != null)
             .CountAsync(ct); // Simplified; actual sum requires decryption
 
+        // ── Incident trend (monthly counts by type, last 12 months) ────────
+        var trendStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero).AddMonths(-11);
+        var incidentTrend = await _db.Incidents
+            .Where(i => !i.IsDeleted && i.DateTime >= trendStart && i.DateTime <= endDate)
+            .GroupBy(i => new { i.DateTime.Year, i.DateTime.Month, i.IncidentType })
+            .Select(g => new MonthlyTrendPoint
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                Value = g.Count(),
+                Category = g.Key.IncidentType.ToString(),
+            })
+            .OrderBy(p => p.Year).ThenBy(p => p.Month)
+            .ToListAsync(ct);
+
+        // ── TRIR trend (monthly) ────────────────────────────────────────────
+        var monthlyRecordable = await _db.Incidents
+            .Where(i => !i.IsDeleted && i.IsOshaRecordable == true && i.DateTime >= trendStart && i.DateTime <= endDate)
+            .GroupBy(i => new { i.DateTime.Year, i.DateTime.Month })
+            .Select(g => new { g.Key.Year, g.Key.Month, Count = g.Count() })
+            .ToListAsync(ct);
+
+        var monthlyHours = await _db.HoursWorkedEntries
+            .Where(h => h.DivisionId == null)
+            .Where(h => (h.Year > trendStart.Year || (h.Year == trendStart.Year && h.Month >= trendStart.Month))
+                     && (h.Year < now.Year || (h.Year == now.Year && h.Month <= now.Month)))
+            .ToListAsync(ct);
+
+        var trirTrendData = monthlyHours
+            .Select(h =>
+            {
+                var recordable = monthlyRecordable
+                    .FirstOrDefault(r => r.Year == h.Year && r.Month == h.Month)?.Count ?? 0;
+                var rate = h.Hours > 0 ? recordable * OshaRules.HoursMultiplier / h.Hours : 0;
+                return new MonthlyTrendPoint { Year = h.Year, Month = h.Month, Value = rate };
+            })
+            .OrderBy(p => p.Year).ThenBy(p => p.Month)
+            .ToList();
+
+        // ── Division breakdown ──────────────────────────────────────────────
+        var divisionBreakdown = await _db.Incidents
+            .Where(i => !i.IsDeleted && i.DateTime >= startDate && i.DateTime <= endDate)
+            .Where(i => i.Division != null)
+            .GroupBy(i => new { Division = i.Division!.Name, i.IncidentType })
+            .Select(g => new DivisionBreakdownItem
+            {
+                Division = g.Key.Division,
+                IncidentType = g.Key.IncidentType.ToString(),
+                Count = g.Count(),
+            })
+            .ToListAsync(ct);
+
+        // ── Severity distribution ───────────────────────────────────────────
+        var severityDistribution = await _db.Incidents
+            .Where(i => !i.IsDeleted && i.DateTime >= startDate && i.DateTime <= endDate && i.Severity != null)
+            .GroupBy(i => i.Severity!)
+            .Select(g => new SeverityDistributionItem
+            {
+                Severity = g.Key.ToString()!,
+                Count = g.Count(),
+            })
+            .ToListAsync(ct);
+
+        // ── Recent incidents (latest 10) ────────────────────────────────────
+        var recentIncidents = await _db.Incidents
+            .Include(i => i.ReportedBy)
+            .Include(i => i.Division)
+            .Where(i => !i.IsDeleted)
+            .OrderByDescending(i => i.DateTime)
+            .Take(10)
+            .Select(i => new IncidentListItemResponse
+            {
+                Id = i.Id,
+                IncidentNumber = i.IncidentNumber,
+                IncidentType = i.IncidentType.ToString(),
+                DateTime = i.DateTime,
+                Division = i.Division != null ? i.Division.Name : null,
+                Project = null,
+                Severity = i.Severity != null ? i.Severity.ToString() : null,
+                Status = i.Status.ToString(),
+                Description = i.Description,
+                ReportedBy = i.ReportedBy != null ? i.ReportedBy.DisplayName : "Unknown",
+                Location = new LocationResponse
+                {
+                    Latitude = i.LocationLatitude,
+                    Longitude = i.LocationLongitude,
+                    TextDescription = i.LocationDescription,
+                    GpsSource = i.LocationGpsSource,
+                },
+            })
+            .ToListAsync(ct);
+
         return new DashboardResponse
         {
             Kpis = new DashboardKpiResponse
@@ -77,10 +169,10 @@ public class GetSafetyDashboardQueryHandler : IRequestHandler<GetSafetyDashboard
                 OpenCapas = openCapas,
                 LostWorkDaysYtd = lostWorkDaysYtd,
             },
-            IncidentTrend = [],
-            TrirTrend = [],
-            DivisionBreakdown = [],
-            SeverityDistribution = [],
+            IncidentTrend = incidentTrend,
+            TrirTrend = trirTrendData,
+            DivisionBreakdown = divisionBreakdown,
+            SeverityDistribution = severityDistribution,
             LeadingIndicators = new LeadingIndicatorsResponse
             {
                 NearMissReportingRate = 0,
@@ -90,7 +182,7 @@ public class GetSafetyDashboardQueryHandler : IRequestHandler<GetSafetyDashboard
                 InvestigationTimeliness = 0,
                 InvestigationTimelinessTarget = 0.90m,
             },
-            RecentIncidents = [],
+            RecentIncidents = recentIncidents,
         };
     }
 }

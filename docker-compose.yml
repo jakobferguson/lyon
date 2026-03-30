@@ -12,6 +12,7 @@ services:
     build:
       context: .
       dockerfile: src/Lyon.Api/Dockerfile
+    restart: on-failure
     ports:
       - "5000:8080"
     environment:
@@ -27,11 +28,14 @@ services:
     build:
       context: .
       dockerfile: src/Lyon.Worker/Dockerfile
+    restart: on-failure
     environment:
       - DOTNET_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=lyon;Username=lyon;Password=lyon_dev_password
       - Encryption__Key=0123456789abcdef0123456789abcdef
     depends_on:
+      lyon-api:
+        condition: service_started
       db:
         condition: service_healthy
 

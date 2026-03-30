@@ -83,9 +83,9 @@ export interface Investigation {
   id: string;
   incidentId: string;
   incidentNumber: string;
-  severity: Severity;
-  division: Division | '';
-  project: string;
+  severity?: Severity;
+  division?: Division | '';
+  project?: string;
   status: InvestigationStatus;
   assignment: InvestigationAssignment | null;
   fiveWhys: FiveWhyStep[];

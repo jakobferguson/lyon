@@ -53,7 +53,7 @@ export interface LinkedIncidentDto {
 export const capaKeys = {
   all: ['capas'] as const,
   lists: () => [...capaKeys.all, 'list'] as const,
-  list: (params: Record<string, unknown>) => [...capaKeys.lists(), params] as const,
+  list: (params: CapaListParams) => [...capaKeys.lists(), params] as const,
   details: () => [...capaKeys.all, 'detail'] as const,
   detail: (id: string) => [...capaKeys.details(), id] as const,
 };

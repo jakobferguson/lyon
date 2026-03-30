@@ -80,7 +80,7 @@ export interface WitnessStatementDto {
 export const investigationKeys = {
   all: ['investigations'] as const,
   lists: () => [...investigationKeys.all, 'list'] as const,
-  list: (params: Record<string, unknown>) => [...investigationKeys.lists(), params] as const,
+  list: (params: InvestigationListParams) => [...investigationKeys.lists(), params] as const,
   details: () => [...investigationKeys.all, 'detail'] as const,
   detail: (id: string) => [...investigationKeys.details(), id] as const,
   byIncident: (incidentId: string) => [...investigationKeys.all, 'by-incident', incidentId] as const,

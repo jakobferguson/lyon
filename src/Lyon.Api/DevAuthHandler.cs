@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Lyon.Domain.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
@@ -24,6 +25,14 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
             ?? "00000000-0000-0000-0000-000000000001";
         var role = Request.Headers["X-Dev-User-Role"].FirstOrDefault() ?? "Admin";
         var name = Request.Headers["X-Dev-User-Name"].FirstOrDefault() ?? "Dev Admin";
+
+        // Normalize role: frontend sends snake_case (e.g. "safety_manager"),
+        // but CurrentUserService parses as PascalCase enum (e.g. "SafetyManager")
+        role = role.Replace("_", "");
+
+        // Ensure userId is a valid GUID; if not, use default dev user
+        if (!Guid.TryParse(userId, out _))
+            userId = "00000000-0000-0000-0000-000000000001";
 
         var claims = new[]
         {
